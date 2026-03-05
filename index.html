@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ManaMarket Ultra | Pro Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; color: #f1f5f9; overflow-x: hidden; }
+        .glass { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(24px); border: 1px solid rgba(255,255,255,0.08); }
+        .active-tab { color: #3b82f6; position: relative; }
+        .active-tab::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 100%; height: 2px; background: #3b82f6; border-radius: 2px; }
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+    </style>
+</head>
+<body class="p-4 lg:p-8">
+
+    <div id="authModal" class="fixed inset-0 z-[100] bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-6 hidden">
+        <div class="glass max-w-md w-full p-10 rounded-[40px] shadow-2xl border border-white/10 text-center">
+            <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-500/20">
+                <i data-lucide="lock" class="text-white"></i>
+            </div>
+            <h2 id="authTitle" class="text-3xl font-black mb-2">Initialize Session</h2>
+            <p id="authSub" class="text-slate-500 text-sm mb-8">Access the ManaMarket Cloud Network</p>
+            <div class="space-y-4">
+                <input type="text" id="authEmail" placeholder="Email Address" class="w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                <input type="password" id="authPass" placeholder="Password" class="w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                <button onclick="handleAuthAction()" id="authMainBtn" class="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-2xl font-bold transition-all shadow-xl shadow-blue-900/40">Secure Sign In</button>
+                <button onclick="toggleAuthMode()" id="authSwitch" class="text-xs text-slate-500 hover:text-white font-bold uppercase tracking-widest transition-colors">Request Access (Register)</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-[1650px] mx-auto">
+        <header class="flex flex-col lg:flex-row justify-between items-center mb-10 gap-6 glass p-6 rounded-[32px]">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg"><i data-lucide="zap" class="text-white"></i></div>
+                <div>
+                    <h1 class="text-2xl font-black">ManaMarket <span class="text-blue-500">Ultra</span></h1>
+                    <div class="flex items-center gap-2"><span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span><span class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Live Network Active</span></div>
+                </div>
+            </div>
+
+            <nav class="flex gap-8 text-xs font-bold uppercase tracking-widest text-slate-400">
+                <button onclick="switchTab('search')" id="tabSearch" class="active-tab transition-all">Search</button>
+                <button onclick="switchTab('sets')" id="tabSets" class="hover:text-white transition-all">Sets</button>
+                <button onclick="switchTab('decks')" id="tabDecks" class="hover:text-white transition-all">Decks</button>
+                <button onclick="switchTab('vault')" id="tabVault" class="hover:text-white transition-all text-emerald-400">Vault</button>
+                <button onclick="switchTab('profile')" id="tabProfile" class="hover:text-white transition-all text-violet-400">Profile</button>
+            </nav>
+
+            <div id="userDisplay" class="flex items-center gap-4 bg-slate-950/50 p-2 pr-6 rounded-2xl border border-white/5 cursor-pointer" onclick="switchTab('profile')">
+                <div id="userAvatar" class="w-10 h-10 rounded-xl bg-blue-500 flex items-center justify-center font-black">?</div>
+                <div class="text-left">
+                    <p class="text-[10px] text-slate-500 font-bold uppercase">Archivist</p>
+                    <p id="userName" class="text-sm font-black">Guest</p>
+                </div>
+            </div>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <aside class="lg:col-span-4 glass rounded-[40px] p-6 h-[800px] flex flex-col">
+                <div id="searchBar" class="mb-6 relative">
+                    <input type="text" id="mainSearch" class="w-full bg-slate-950 border border-slate-800 rounded-2xl py-4 px-12 outline-none focus:ring-2 focus:ring-blue-500" placeholder="Card name or set...">
+                    <i data-lucide="search" class="absolute left-4 top-4.5 w-5 text-slate-500"></i>
+                </div>
+                <div id="listScroll" class="flex-1 overflow-y-auto custom-scroll pr-2 space-y-2">
+                    <div class="text-center mt-20 text-slate-600 italic text-sm">Welcome back. Start searching or browse sets to begin.</div>
+                </div>
+            </aside>
+
+            <section class="lg:col-span-8 space-y-8">
+                
+                <div id="searchView" class="glass rounded-[40px] p-10 min-h-[500px] border border-white/5">
+                    <div id="cardContent" class="hidden animate-in fade-in zoom-in-95">
+                        <div class="flex flex-col xl:flex-row gap-12">
+                            <div class="w-full xl:w-[320px] shrink-0">
+                                <img id="cardImg" class="w-full rounded-[24px] shadow-2xl mb-6">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <button onclick="addToVault()" class="py-3 bg-emerald-600 rounded-xl font-bold text-[10px] uppercase">Add Vault</button>
+                                    <select id="deckSelect" onchange="addToDeck(this.value)" class="bg-slate-900 rounded-xl text-[10px] font-bold uppercase px-2"></select>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <h2 id="cardTitle" class="text-5xl font-black"></h2>
+                                <p id="cardSetInfo" class="text-blue-500 font-bold uppercase text-xs mt-2 mb-8"></p>
+                                <div class="grid grid-cols-3 gap-4 mb-8">
+                                    <div class="bg-slate-950 p-6 rounded-3xl"><p class="text-[10px] text-slate-500 font-bold uppercase">GBP Price</p><p id="cardPrice" class="text-2xl font-black text-white">£0.00</p></div>
+                                    <div class="bg-slate-950 p-6 rounded-3xl"><p class="text-[10px] text-slate-500 font-bold uppercase">Mana Value</p><p id="cardCmc" class="text-2xl font-black text-blue-400">0</p></div>
+                                    <div id="cardLegality" class="bg-slate-950 p-6 rounded-3xl text-center"><p class="text-[10px] text-slate-500 font-bold uppercase">Legality</p><p class="text-xs font-black mt-1 text-emerald-400">LEGAL</p></div>
+                                </div>
+                                <div class="h-64 glass rounded-3xl p-4"><canvas id="priceTrend"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="vaultView" class="hidden glass rounded-[40px] p-8 min-h-[800px] border border-white/5">
+                    <div class="flex justify-between items-end mb-8">
+                        <h2 class="text-4xl font-black">The Vault</h2>
+                        <div class="flex gap-4">
+                            <select id="vSort" onchange="renderVault()" class="bg-slate-900 px-4 py-2 rounded-xl text-xs font-bold outline-none border border-slate-800"><option value="price">Price</option><option value="name">Name</option></select>
+                            <select id="vType" onchange="renderVault()" class="bg-slate-900 px-4 py-2 rounded-xl text-xs font-bold outline-none border border-slate-800"><option value="all">All Types</option><option value="Creature">Creature</option><option value="Instant">Instant</option></select>
+                        </div>
+                    </div>
+                    <div id="vaultGrid" class="grid grid-cols-2 md:grid-cols-5 gap-4"></div>
+                </div>
+
+                <div id="profileView" class="hidden glass rounded-[40px] p-12 border border-white/5">
+                    <div class="flex items-center gap-10 mb-12">
+                        <div id="profAvatar" class="w-32 h-32 rounded-[40px] bg-gradient-to-br from-blue-600 to-violet-600 flex items-center justify-center text-5xl font-black">?</div>
+                        <div>
+                            <h2 id="profName" class="text-6xl font-black tracking-tighter">Archivist</h2>
+                            <p class="text-slate-500 font-bold uppercase tracking-widest mt-2">ManaMarket Verified Member</p>
+                            <button onclick="logout()" class="mt-4 text-rose-500 font-bold uppercase text-[10px] tracking-widest hover:underline">Terminate Session</button>
+                        </div>
+                    </div>
+                    <div id="statsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+                </div>
+
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // CONFIG & CORE STATE
+        let rates = { GBP: 0.79 };
+        let currentUser = JSON.parse(localStorage.getItem('mm_session')) || null;
+        let authMode = 'login'; // or 'register'
+        let activeCard = null;
+        let trendChart = null;
+
+        // AUTH SYSTEM
+        function toggleAuthMode() {
+            authMode = authMode === 'login' ? 'register' : 'login';
+            document.getElementById('authTitle').innerText = authMode === 'login' ? 'Initialize Session' : 'Request Access';
+            document.getElementById('authMainBtn').innerText = authMode === 'login' ? 'Secure Sign In' : 'Register Account';
+            document.getElementById('authSwitch').innerText = authMode === 'login' ? 'Request Access (Register)' : 'Already Verified? Login';
+        }
+
+        function handleAuthAction() {
+            const email = document.getElementById('authEmail').value;
+            const pass = document.getElementById('authPass').value;
+            if(!email || !pass) return alert("Credentials Required");
+
+            let users = JSON.parse(localStorage.getItem('mm_users')) || {};
+
+            if(authMode === 'login') {
+                if(users[email] && users[email].pass === btoa(pass)) {
+                    startSession(email);
+                } else alert("Access Denied: Invalid Credentials");
+            } else {
+                if(users[email]) return alert("Account Already Exists");
+                users[email] = { pass: btoa(pass), vault: [], decks: [] };
+                localStorage.setItem('mm_users', JSON.stringify(users));
+                startSession(email);
+            }
+        }
+
+        function startSession(email) {
+            localStorage.setItem('mm_session', JSON.stringify(email));
+            location.reload();
+        }
+
+        function logout() {
+            localStorage.removeItem('mm_session');
+            location.reload();
+        }
+
+        // APP LOGIC
+        const allUsers = JSON.parse(localStorage.getItem('mm_users')) || {};
+        const userData = currentUser ? allUsers[currentUser] : null;
+
+        async function init() {
+            if(!currentUser) {
+                document.getElementById('authModal').classList.remove('hidden');
+            } else {
+                document.getElementById('userName').innerText = currentUser.split('@')[0];
+                document.getElementById('userAvatar').innerText = currentUser[0].toUpperCase();
+                document.getElementById('profAvatar').innerText = currentUser[0].toUpperCase();
+                document.getElementById('profName').innerText = currentUser.split('@')[0];
+                updateDeckSelects();
+                updateProfileStats();
+            }
+            lucide.createIcons();
+        }
+
+        // SET BROWSER (BACK IN)
+        async function loadSets() {
+            const scroll = document.getElementById('listScroll');
+            scroll.innerHTML = '<div class="flex justify-center py-20"><i data-lucide="loader" class="animate-spin text-blue-500"></i></div>';
+            lucide.createIcons();
+            
+            const res = await fetch('https://api.scryfall.com/sets');
+            const data = await res.json();
+            scroll.innerHTML = data.data.filter(s => ['expansion','core'].includes(s.set_type)).map(s => `
+                <div onclick="browseSet('${s.code}')" class="p-3 rounded-xl bg-slate-900 border border-white/5 flex items-center gap-4 cursor-pointer hover:bg-blue-600/20 transition-all">
+                    <img src="${s.icon_svg_uri}" class="w-4 h-4 invert opacity-70">
+                    <span class="text-xs font-bold">${s.name}</span>
+                </div>
+            `).join('');
+        }
+
+        async function browseSet(code) {
+            const res = await fetch(`https://api.scryfall.com/cards/search?q=set:${code}`);
+            const data = await res.json();
+            renderList(data.data);
+        }
+
+        // SEARCH
+        document.getElementById('mainSearch').addEventListener('keypress', async (e) => {
+            if(e.key === 'Enter') {
+                const res = await fetch(`https://api.scryfall.com/cards/search?q=${encodeURIComponent(e.target.value)}`);
+                const data = await res.json();
+                if(data.data) renderList(data.data);
+            }
+        });
+
+        function renderList(cards) {
+            const scroll = document.getElementById('listScroll');
+            scroll.innerHTML = cards.map(c => `
+                <div onclick='showCard(${JSON.stringify(c).replace(/'/g, "&apos;")})' class="p-4 rounded-2xl bg-slate-900 border border-white/5 flex justify-between cursor-pointer hover:bg-slate-800">
+                    <span class="text-xs font-bold truncate w-40">${c.name}</span>
+                    <span class="text-[10px] text-blue-400 font-black">£${(parseFloat(c.prices.usd || 0) * rates.GBP).toFixed(2)}</span>
+                </div>
+            `).join('');
+        }
+
+        function showCard(card) {
+            activeCard = card;
+            document.getElementById('cardContent').classList.remove('hidden');
+            document.getElementById('cardImg').src = card.image_uris?.normal || card.card_faces[0].image_uris.normal;
+            document.getElementById('cardTitle').innerText = card.name;
+            document.getElementById('cardPrice').innerText = `£${(parseFloat(card.prices.usd || 0) * rates.GBP).toFixed(2)}`;
+            document.getElementById('cardCmc').innerText = card.cmc || 0;
+            renderTrend(parseFloat(card.prices.usd));
+        }
+
+        // VAULT & DATA
+        function addToVault() {
+            if(!activeCard) return;
+            userData.vault.push({
+                id: Date.now(),
+                name: activeCard.name,
+                price: parseFloat(activeCard.prices.usd || 0),
+                type: activeCard.type_line,
+                img: activeCard.image_uris?.small || activeCard.card_faces[0].image_uris.small
+            });
+            save();
+            alert("Secured in Vault");
+        }
+
+        function renderVault() {
+            const grid = document.getElementById('vaultGrid');
+            const type = document.getElementById('vType').value;
+            let filtered = userData.vault.filter(c => type === 'all' || c.type.includes(type));
+            
+            grid.innerHTML = filtered.map(c => `
+                <div class="relative group aspect-[3/4] rounded-2xl overflow-hidden border border-white/5">
+                    <img src="${c.img}" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-slate-950/80 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center p-4 transition-all">
+                        <p class="text-xs font-black text-blue-400">£${(c.price * rates.GBP).toFixed(2)}</p>
+                        <button onclick="removeFromVault(${c.id})" class="mt-4 text-[9px] text-rose-500 font-black uppercase">Remove</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function removeFromVault(id) {
+            userData.vault = userData.vault.filter(c => c.id !== id);
+            save();
+            renderVault();
+        }
+
+        function save() {
+            allUsers[currentUser] = userData;
+            localStorage.setItem('mm_users', JSON.stringify(allUsers));
+            updateProfileStats();
+        }
+
+        function updateProfileStats() {
+            const worth = userData.vault.reduce((s, c) => s + c.price, 0) * rates.GBP;
+            document.getElementById('statsGrid').innerHTML = `
+                <div class="bg-slate-900/40 p-8 rounded-[32px] border border-white/5"><p class="text-xs font-bold text-slate-500 mb-2 uppercase">Net Worth</p><h3 class="text-3xl font-black text-emerald-400">£${worth.toFixed(2)}</h3></div>
+                <div class="bg-slate-900/40 p-8 rounded-[32px] border border-white/5"><p class="text-xs font-bold text-slate-500 mb-2 uppercase">Assets</p><h3 class="text-3xl font-black text-blue-400">${userData.vault.length}</h3></div>
+                <div class="bg-slate-900/40 p-8 rounded-[32px] border border-white/5"><p class="text-xs font-bold text-slate-500 mb-2 uppercase">Network Status</p><h3 class="text-3xl font-black text-violet-400">Verified</h3></div>
+            `;
+        }
+
+        function switchTab(mode) {
+            ['search', 'sets', 'decks', 'vault', 'profile'].forEach(m => {
+                const el = document.getElementById(`${m}View`);
+                if(el) el.classList.toggle('hidden', m !== mode);
+                const btn = document.getElementById(`tab${m.charAt(0).toUpperCase()+m.slice(1)}`);
+                if(btn) btn.classList.toggle('active-tab', m === mode);
+            });
+            if(mode === 'sets') loadSets();
+            if(mode === 'vault') renderVault();
+        }
+
+        function renderTrend(base) {
+            const ctx = document.getElementById('priceTrend').getContext('2d');
+            if(trendChart) trendChart.destroy();
+            trendChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['W1', 'W2', 'W3', 'W4'],
+                    datasets: [{ data: [base*0.9, base*1.1, base*0.95, base], borderColor: '#3b82f6', tension: 0.4, fill: true, backgroundColor: 'rgba(59, 130, 246, 0.05)', pointRadius: 0 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#475569', font: { size: 9 } } } } }
+            });
+        }
+
+        function updateDeckSelects() { /* Implementation for deck building select */ }
+
+        init();
+    </script>
+</body>
+</html>
