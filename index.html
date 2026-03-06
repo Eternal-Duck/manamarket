@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ManaMarket Ultra | Social Edition</title>
+    <title>ManaMarket Ultra | Sovereign Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -15,511 +15,375 @@
         .active-tab::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 100%; height: 2px; background: #3b82f6; border-radius: 2px; }
         .custom-scroll::-webkit-scrollbar { width: 4px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
-        .price-up { color: #10b981; }
-        .price-down { color: #ef4444; }
         @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-        .animate-marquee { display: inline-block; white-space: nowrap; animation: marquee 20s linear infinite; }
+        .animate-marquee { display: inline-block; white-space: nowrap; animation: marquee 25s linear infinite; }
     </style>
 </head>
 <body class="p-4 lg:p-8">
 
     <div class="fixed top-0 left-0 w-full bg-blue-600/10 border-b border-blue-500/20 py-1 overflow-hidden z-[60]">
         <div class="animate-marquee text-[10px] font-black uppercase tracking-widest text-blue-400">
-            System Online • <span id="tickerText">New member joined from London • User 'Mox_Emerald' added 3 items to Vault • Market trending +2.4% today • </span>
+            • SECURE NETWORK LAYER ACTIVE • ENCRYPTION: SHA-256 • NO CENTRAL SERVER LOGS • YOUR KEY, YOUR DATA • 
         </div>
     </div>
 
-    <div id="authModal" class="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-xl flex items-center justify-center p-6 hidden">
-        <div class="glass max-w-md w-full p-10 rounded-[40px] shadow-2xl border border-white/10 text-center">
-            <div class="w-20 h-20 bg-blue-600 rounded-[30px] flex items-center justify-center mx-auto mb-8 shadow-xl shadow-blue-500/20 rotate-3">
-                <i data-lucide="zap" class="text-white" size="32"></i>
+    <div id="authModal" class="fixed inset-0 z-[100] bg-slate-950/98 backdrop-blur-2xl flex items-center justify-center p-6 hidden">
+        <div class="glass max-w-md w-full p-10 rounded-[40px] shadow-2xl border border-white/10">
+            <div id="authMainUI">
+                <div class="text-center mb-8">
+                    <div class="w-20 h-20 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl rotate-3">
+                        <i data-lucide="shield-lock" class="text-white" size="32"></i>
+                    </div>
+                    <h2 id="authTitle" class="text-3xl font-black tracking-tighter">Vault Encryption</h2>
+                    <p id="authSub" class="text-slate-500 text-sm mt-2 font-medium">ManaMarket Sovereign Login</p>
+                </div>
+
+                <div class="space-y-4">
+                    <input type="email" id="authEmail" placeholder="Identity (Email)" class="w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium">
+                    <input type="password" id="authPass" placeholder="Master Key" class="w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                    
+                    <div id="registerFields" class="hidden space-y-4">
+                        <input type="password" id="authPassConfirm" placeholder="Confirm Master Key" class="w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                    </div>
+
+                    <button onclick="handleAuthAction()" id="authMainBtn" class="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-2xl font-black uppercase tracking-widest text-xs mt-2 transition-all shadow-xl shadow-blue-900/40">Decrypt Archive</button>
+                    
+                    <div class="flex flex-col gap-4 mt-6">
+                        <button onclick="toggleAuthMode()" id="authSwitch" class="text-[10px] text-slate-500 hover:text-white font-black uppercase tracking-widest transition-colors">Create New Profile</button>
+                        <button onclick="showRecoveryUI()" class="text-[10px] text-rose-500/50 hover:text-rose-500 font-black uppercase tracking-widest transition-colors">Lost Master Key?</button>
+                    </div>
+                </div>
             </div>
-            <h2 id="authTitle" class="text-4xl font-black mb-2 tracking-tighter">ManaMarket <span class="text-blue-500">Ultra</span></h2>
-            <p id="authSub" class="text-slate-500 text-sm mb-8 font-medium">The Professional Standard for TCG Archives</p>
-            <div class="space-y-4">
-                <input type="text" id="authEmail" placeholder="Email Address" class="w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                <input type="password" id="authPass" placeholder="Password" class="w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                <button onclick="handleAuthAction()" id="authMainBtn" class="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-2xl font-bold transition-all shadow-xl shadow-blue-900/40">Secure Initialize</button>
-                <button onclick="toggleAuthMode()" id="authSwitch" class="text-xs text-slate-500 hover:text-white font-bold uppercase tracking-widest transition-colors">Request Access Profile</button>
+
+            <div id="seedDisplayUI" class="hidden text-center">
+                <div class="w-16 h-16 bg-emerald-500/20 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i data-lucide="key" size="28"></i>
+                </div>
+                <h3 class="text-2xl font-black mb-2">Save Recovery Seed</h3>
+                <p class="text-slate-500 text-xs mb-6">If you lose your Master Key, this is the ONLY way to recover your vault. Write this down.</p>
+                <div id="seedGrid" class="grid grid-cols-3 gap-2 bg-slate-950 p-4 rounded-2xl border border-white/5 mb-6 text-[10px] font-mono font-bold"></div>
+                <button onclick="location.reload()" class="w-full bg-white text-black py-4 rounded-2xl font-black uppercase tracking-widest text-xs">I Have Saved It</button>
+            </div>
+
+            <div id="recoveryActionUI" class="hidden">
+                <h3 class="text-2xl font-black mb-4">Master Key Reset</h3>
+                <p class="text-slate-500 text-xs mb-6">Input your 12-word recovery seed to set a new Master Key.</p>
+                <textarea id="recoverySeedInput" placeholder="Enter 12 words separated by spaces..." class="w-full h-32 bg-slate-950 border border-slate-800 rounded-2xl p-4 text-xs font-mono mb-4 outline-none focus:ring-1 focus:ring-blue-500"></textarea>
+                <input type="password" id="newMasterKey" placeholder="New Master Key" class="w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 outline-none mb-4">
+                <button onclick="executeRecovery()" class="w-full bg-rose-600 py-4 rounded-2xl font-black uppercase tracking-widest text-xs">Reset & Login</button>
+                <button onclick="location.reload()" class="w-full text-slate-500 text-[10px] font-black uppercase mt-4">Cancel</button>
             </div>
         </div>
     </div>
 
-    <div class="max-w-[1700px] mx-auto pt-6">
+    <div class="max-w-[1700px] mx-auto pt-10">
         <header class="flex flex-col lg:flex-row justify-between items-center mb-10 gap-6 glass p-6 rounded-[32px] border-white/5 shadow-2xl">
             <div class="flex items-center gap-5 cursor-pointer" onclick="location.href=location.pathname">
-                <div class="w-14 h-14 bg-gradient-to-br from-blue-600 to-violet-600 rounded-2xl flex items-center justify-center shadow-lg"><i data-lucide="shield-check" class="text-white"></i></div>
+                <div class="w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg"><i data-lucide="database" class="text-white"></i></div>
                 <div>
                     <h1 class="text-3xl font-black tracking-tight leading-none">ManaMarket</h1>
-                    <div class="flex items-center gap-2 mt-1"><span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span><span class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Global Network Active</span></div>
+                    <div class="flex items-center gap-2 mt-1"><span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span><span class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Sovereign Protocol v3.0</span></div>
                 </div>
             </div>
 
             <nav class="flex gap-10 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500">
-                <button onclick="switchTab('search')" id="tabSearch" class="active-tab transition-all hover:text-white">Terminal</button>
-                <button onclick="switchTab('vault')" id="tabVault" class="hover:text-white transition-all">The Vault</button>
-                <button onclick="switchTab('decks')" id="tabDecks" class="hover:text-white transition-all">Projects</button>
-                <button onclick="switchTab('members')" id="tabMembers" class="text-amber-500 hover:text-amber-400 transition-all">Network</button>
-                <button onclick="switchTab('profile')" id="tabProfile" class="text-violet-400 hover:text-violet-300 transition-all">Profile</button>
+                <button onclick="switchTab('search')" id="tabSearch" class="active-tab">Database</button>
+                <button onclick="switchTab('vault')" id="tabVault">The Vault</button>
+                <button onclick="switchTab('members')" id="tabMembers" class="text-amber-500">Network</button>
+                <button onclick="switchTab('profile')" id="tabProfile" class="text-violet-400">Dashboard</button>
             </nav>
 
-            <div id="userDisplay" class="flex items-center gap-4 bg-slate-950/50 p-2 pr-6 rounded-2xl border border-white/5 cursor-pointer group" onclick="switchTab('profile')">
-                <div id="userAvatar" class="w-11 h-11 rounded-xl bg-blue-600 flex items-center justify-center font-black text-sm group-hover:scale-110 transition-transform">?</div>
+            <div id="userDisplay" class="flex items-center gap-4 bg-slate-950/50 p-2 pr-6 rounded-2xl border border-white/5 cursor-pointer" onclick="switchTab('profile')">
+                <div id="userAvatar" class="w-11 h-11 rounded-xl bg-blue-600 flex items-center justify-center font-black text-sm">?</div>
                 <div class="text-left">
-                    <p class="text-[9px] text-slate-500 font-bold uppercase tracking-tighter">Pro Archivist</p>
+                    <p class="text-[9px] text-slate-500 font-bold uppercase tracking-tighter">Secured Session</p>
                     <p id="userName" class="text-sm font-black text-white leading-none">Guest</p>
                 </div>
             </div>
         </header>
 
         <main class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <aside class="lg:col-span-3 glass rounded-[40px] p-6 h-[850px] flex flex-col border border-white/5 shadow-2xl">
+            <aside class="lg:col-span-3 glass rounded-[40px] p-6 h-[850px] flex flex-col border border-white/5">
                 <div class="mb-6">
-                    <h3 class="text-xs font-black uppercase text-slate-500 mb-4 tracking-widest">Market Search</h3>
                     <div class="relative">
-                        <input type="text" id="dbSearch" class="w-full bg-slate-950 border border-slate-800 rounded-2xl py-4 px-12 outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm" placeholder="Scan database...">
+                        <input type="text" id="dbSearch" class="w-full bg-slate-950 border border-slate-800 rounded-2xl py-4 px-12 outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm" placeholder="Scan assets...">
                         <i data-lucide="search" class="absolute left-4 top-4 w-5 text-slate-500"></i>
                     </div>
                 </div>
-                
-                <div id="listContainer" class="flex-1 overflow-y-auto custom-scroll pr-2 space-y-2">
-                    <div class="p-6 text-center text-slate-600 italic text-xs">
-                        Input card signature to begin analysis.
-                    </div>
-                </div>
-
-                <div class="mt-6 pt-6 border-t border-white/5">
-                    <h3 class="text-[10px] font-black uppercase text-slate-500 mb-4 tracking-widest">Set Browser</h3>
-                    <div id="setList" class="grid grid-cols-4 gap-2"></div>
-                </div>
+                <div id="listContainer" class="flex-1 overflow-y-auto custom-scroll pr-2 space-y-2"></div>
             </aside>
 
             <section class="lg:col-span-9 space-y-8">
-                
                 <div id="searchView" class="glass rounded-[40px] p-10 min-h-[500px] border border-white/5 relative overflow-hidden">
                     <div id="cardContent" class="hidden relative z-10">
                         <div class="flex flex-col xl:flex-row gap-12">
                             <div class="w-full xl:w-[360px] shrink-0">
-                                <img id="displayImg" class="w-full rounded-[30px] shadow-[0_20px_50px_rgba(0,0,0,0.5)] mb-6 ring-1 ring-white/10">
-                                <div class="grid grid-cols-2 gap-4">
-                                    <button onclick="addToVault()" class="py-4 bg-emerald-600 hover:bg-emerald-500 rounded-2xl font-black text-xs uppercase tracking-widest transition-all">Add to Vault</button>
-                                    <button onclick="addToWishlist()" class="py-4 bg-slate-800 hover:bg-slate-700 rounded-2xl font-black text-xs uppercase tracking-widest transition-all">Wishlist</button>
-                                </div>
-                                <select id="deckAssignSelect" onchange="addCardToDeck(this.value)" class="w-full mt-4 bg-slate-900 border border-slate-800 rounded-xl p-3 text-[10px] font-bold uppercase text-slate-400 focus:text-white outline-none"></select>
+                                <img id="displayImg" class="w-full rounded-[30px] shadow-2xl mb-6 ring-1 ring-white/10">
+                                <button onclick="addToVault()" class="w-full py-4 bg-blue-600 hover:bg-blue-500 rounded-2xl font-black text-xs uppercase tracking-widest transition-all">Secure in Vault</button>
                             </div>
                             <div class="flex-1">
-                                <div class="flex justify-between items-start">
-                                    <div>
-                                        <h2 id="displayName" class="text-6xl font-black tracking-tighter"></h2>
-                                        <p id="displaySet" class="text-blue-500 font-bold uppercase text-xs mt-2 tracking-widest"></p>
+                                <h2 id="displayName" class="text-6xl font-black tracking-tighter"></h2>
+                                <p id="displaySet" class="text-blue-500 font-bold uppercase text-xs mt-2 tracking-widest mb-10"></p>
+                                <div class="grid grid-cols-3 gap-6 mb-10">
+                                    <div class="bg-slate-950/50 p-6 rounded-3xl border border-white/5">
+                                        <p class="text-[9px] text-slate-500 font-black uppercase">Market Value</p>
+                                        <p id="displayPrice" class="text-3xl font-black text-white">£0.00</p>
                                     </div>
-                                    <div class="text-right">
-                                        <p id="displayPrice" class="text-4xl font-black">£0.00</p>
-                                        <p class="text-[10px] font-bold text-emerald-500 uppercase">+1.2% Today</p>
+                                    <div class="bg-slate-950/50 p-6 rounded-3xl border border-white/5">
+                                        <p class="text-[9px] text-slate-500 font-black uppercase">Asset Type</p>
+                                        <p id="displayType" class="text-xl font-black text-blue-400 truncate">N/A</p>
                                     </div>
-                                </div>
-                                
-                                <div class="grid grid-cols-4 gap-4 my-10">
-                                    <div class="bg-slate-950/50 p-5 rounded-3xl border border-white/5 text-center">
-                                        <p class="text-[9px] text-slate-500 font-black uppercase mb-1">Mana</p>
-                                        <p id="displayCMC" class="text-xl font-black text-blue-400">0</p>
-                                    </div>
-                                    <div class="bg-slate-950/50 p-5 rounded-3xl border border-white/5 text-center">
-                                        <p class="text-[9px] text-slate-500 font-black uppercase mb-1">Rarity</p>
-                                        <p id="displayRarity" class="text-xl font-black text-amber-500 uppercase">R</p>
-                                    </div>
-                                    <div class="bg-slate-950/50 p-5 rounded-3xl border border-white/5 text-center">
-                                        <p class="text-[9px] text-slate-500 font-black uppercase mb-1">Standard</p>
-                                        <p id="legStandard" class="text-[10px] font-black uppercase">Legal</p>
-                                    </div>
-                                    <div class="bg-slate-950/50 p-5 rounded-3xl border border-white/5 text-center">
-                                        <p class="text-[9px] text-slate-500 font-black uppercase mb-1">Commander</p>
-                                        <p id="legEDH" class="text-[10px] font-black uppercase">Legal</p>
+                                    <div class="bg-slate-950/50 p-6 rounded-3xl border border-white/5">
+                                        <p class="text-[9px] text-slate-500 font-black uppercase">Mana Score</p>
+                                        <p id="displayCMC" class="text-3xl font-black text-violet-400">0</p>
                                     </div>
                                 </div>
-
-                                <div class="h-64 bg-slate-950/30 rounded-[32px] p-6 border border-white/5 shadow-inner">
+                                <div class="h-64 bg-slate-950/30 rounded-[32px] p-6 border border-white/5">
                                     <canvas id="priceChart"></canvas>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div id="emptyView" class="flex flex-col items-center justify-center h-[500px] text-slate-700">
-                        <i data-lucide="scan" size="64" class="mb-6 opacity-20"></i>
-                        <p class="font-black uppercase tracking-[0.3em] text-xs">Waiting for Input...</p>
-                    </div>
                 </div>
 
                 <div id="vaultView" class="hidden glass rounded-[40px] p-10 border border-white/5">
-                    <div class="flex flex-col md:flex-row justify-between items-end mb-10 gap-6">
-                        <div>
-                            <h2 class="text-5xl font-black tracking-tighter">Your <span class="text-blue-500">Vault</span></h2>
-                            <p class="text-slate-500 text-xs font-bold uppercase mt-2">Personal Secure Assets</p>
-                        </div>
-                        <div class="flex gap-4 w-full md:w-auto">
-                            <select id="vType" onchange="renderVault()" class="bg-slate-900 border border-slate-800 rounded-2xl px-6 py-3 text-xs font-black uppercase outline-none flex-1 md:flex-none">
-                                <option value="all">All Types</option>
-                                <option value="Creature">Creatures</option>
-                                <option value="Instant">Instants</option>
-                                <option value="Sorcery">Sorceries</option>
-                                <option value="Land">Lands</option>
-                            </select>
-                        </div>
-                    </div>
+                    <h2 class="text-5xl font-black mb-10 tracking-tighter">Secured <span class="text-blue-500">Archive</span></h2>
                     <div id="vaultGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6"></div>
                 </div>
 
                 <div id="membersView" class="hidden glass rounded-[40px] p-10 border border-white/5">
-                    <div class="flex justify-between items-center mb-10">
-                        <h2 class="text-5xl font-black tracking-tighter">Network <span class="text-amber-500">Index</span></h2>
-                        <div class="text-right">
-                            <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Global Asset Pool</p>
-                            <p id="netTotalValue" class="text-3xl font-black text-emerald-400">£0</p>
-                        </div>
-                    </div>
-                    <div class="overflow-hidden rounded-[30px] border border-white/5">
-                        <table class="w-full text-left border-collapse">
-                            <thead class="bg-slate-950/50 text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                                <tr>
-                                    <th class="p-6">Rank</th>
-                                    <th>Member</th>
-                                    <th>Portfolio</th>
-                                    <th class="text-center">Decks</th>
-                                    <th class="text-right pr-10">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="memberList" class="bg-slate-950/20"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div id="decksView" class="hidden glass rounded-[40px] p-10 border border-white/5">
-                    <div class="flex justify-between items-center mb-10">
-                        <h2 class="text-5xl font-black tracking-tighter">Active <span class="text-violet-500">Builds</span></h2>
-                        <button onclick="createNewDeck()" class="bg-blue-600 hover:bg-blue-500 px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all">+ New Project</button>
-                    </div>
-                    <div id="decksGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+                    <h2 class="text-5xl font-black mb-10 tracking-tighter">Network <span class="text-amber-500">Registry</span></h2>
+                    <div id="memberList" class="space-y-4"></div>
                 </div>
 
                 <div id="profileView" class="hidden glass rounded-[40px] p-12 border border-white/5">
-                    <div class="flex flex-col md:flex-row items-center gap-12 mb-12 pb-12 border-b border-white/5">
-                        <div id="profAvatar" class="w-40 h-40 rounded-[50px] bg-gradient-to-br from-blue-600 to-violet-600 flex items-center justify-center text-6xl font-black shadow-2xl rotate-3 ring-8 ring-white/5">?</div>
-                        <div class="text-center md:text-left flex-1">
-                            <div class="flex items-center justify-center md:justify-start gap-4 mb-2">
-                                <h2 id="profName" class="text-7xl font-black tracking-tighter leading-none">Archivist</h2>
-                                <span class="bg-blue-500/10 text-blue-500 text-[10px] font-black px-3 py-1 rounded-full border border-blue-500/20">VERIFIED</span>
-                            </div>
-                            <p id="profJoined" class="text-slate-500 font-bold uppercase text-xs tracking-[0.2em] mb-8">Established 2026</p>
-                            <div class="flex flex-wrap gap-4 justify-center md:justify-start">
-                                <button onclick="generatePublicLink()" class="flex items-center gap-2 bg-blue-600 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest"><i data-lucide="share-2" size="14"></i> Copy Link</button>
-                                <button onclick="logout()" class="flex items-center gap-2 bg-rose-500/10 text-rose-500 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border border-rose-500/20">Terminate</button>
+                    <div class="flex flex-col md:flex-row items-center gap-12 mb-12">
+                        <div id="profAvatar" class="w-40 h-40 rounded-[50px] bg-blue-600 flex items-center justify-center text-6xl font-black shadow-2xl">?</div>
+                        <div class="flex-1 text-center md:text-left">
+                            <h2 id="profName" class="text-6xl font-black tracking-tighter">Archivist</h2>
+                            <p id="profIdentity" class="text-slate-500 font-bold uppercase text-[10px] mt-2 tracking-[0.3em]">SECURE SESSION</p>
+                            <div class="mt-8 flex flex-wrap gap-4 justify-center md:justify-start">
+                                <button onclick="logout()" class="bg-rose-500/10 text-rose-500 px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border border-rose-500/20">Close Vault</button>
+                                <button onclick="exportData()" class="bg-slate-900 text-white px-8 py-3 rounded-xl text-[10px] font-black uppercase border border-white/10">Export Data</button>
                             </div>
                         </div>
                     </div>
                     <div id="profileStats" class="grid grid-cols-1 md:grid-cols-3 gap-8"></div>
                 </div>
-
             </section>
         </main>
     </div>
 
     <script>
-        // CONFIG & STATE
+        // --- CRYPTO ENGINE ---
+        async function hashPassword(password, salt) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password + salt);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        const WORD_LIST = ["alpha", "bravo", "cargo", "delta", "echo", "foxtrot", "golf", "hotel", "indigo", "joker", "kilo", "lima", "mambo", "neon", "oscar", "papa", "quick", "romeo", "sierra", "tango", "ultra", "victor", "whisky", "xray", "yankee", "zebra", "apple", "banana", "cherry", "dragon", "eagle", "falcon"];
+        
+        function generateSeed() {
+            let seed = [];
+            for(let i=0; i<12; i++) seed.push(WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)]);
+            return seed.join(' ');
+        }
+
+        // --- STATE ---
         let rates = { GBP: 0.79 };
         let activeCard = null;
         let pChart = null;
-        let currentUser = JSON.parse(localStorage.getItem('mm_session')) || null;
+        let currentUser = null;
         let isRegister = false;
 
-        // AUTH
+        // --- AUTH LOGIC ---
         function toggleAuthMode() {
             isRegister = !isRegister;
-            document.getElementById('authTitle').innerHTML = isRegister ? 'Join <span class="text-blue-500">Ultra</span>' : 'ManaMarket <span class="text-blue-500">Ultra</span>';
-            document.getElementById('authMainBtn').innerText = isRegister ? 'Create Profile' : 'Secure Initialize';
-            document.getElementById('authSwitch').innerText = isRegister ? 'Already an Archivist? Login' : 'Request Access Profile';
+            document.getElementById('authTitle').innerText = isRegister ? 'New Profile' : 'Vault Encryption';
+            document.getElementById('registerFields').classList.toggle('hidden', !isRegister);
+            document.getElementById('authMainBtn').innerText = isRegister ? 'Initialize Security' : 'Decrypt Archive';
         }
 
-        function handleAuthAction() {
-            const email = document.getElementById('authEmail').value;
+        async function handleAuthAction() {
+            const email = document.getElementById('authEmail').value.toLowerCase();
             const pass = document.getElementById('authPass').value;
-            if(!email || !pass) return;
+            if(!email || !pass) return alert("Credentials required.");
+
             let users = JSON.parse(localStorage.getItem('mm_users')) || {};
+
             if(isRegister) {
-                if(users[email]) return alert("Session Conflict: Account Exists");
-                users[email] = { pass: btoa(pass), vault: [], wishlist: [], decks: [], metadata: { joined: 'March 2026', color: 'bg-blue-600' } };
+                if(users[email]) return alert("Archivist exists.");
+                const salt = Array.from(crypto.getRandomValues(new Uint8Array(16))).map(b => b.toString(16).padStart(2, '0')).join('');
+                const hash = await hashPassword(pass, salt);
+                const seed = generateSeed();
+
+                users[email] = { hash, salt, seed, vault: [], decks: [], metadata: { joined: 'March 2026' } };
                 localStorage.setItem('mm_users', JSON.stringify(users));
-                addTickerEvent(`New archivist '${email.split('@')[0]}' joined the network.`);
+                
+                showSeedUI(seed);
             } else {
-                if(!users[email] || users[email].pass !== btoa(pass)) return alert("Access Denied: Signature Invalid");
+                const user = users[email];
+                if(!user) return alert("Vault not found.");
+                const checkHash = await hashPassword(pass, user.salt);
+                if(checkHash === user.hash) {
+                    login(email);
+                } else {
+                    alert("Master Key Mismatch.");
+                }
             }
-            localStorage.setItem('mm_session', JSON.stringify(email));
+        }
+
+        function showSeedUI(seed) {
+            document.getElementById('authMainUI').classList.add('hidden');
+            document.getElementById('seedDisplayUI').classList.remove('hidden');
+            const grid = document.getElementById('seedGrid');
+            seed.split(' ').forEach((w, i) => {
+                grid.innerHTML += `<div class="bg-slate-900 p-2 rounded-lg border border-white/5 text-slate-400"><span class="opacity-30 mr-2">${i+1}.</span>${w}</div>`;
+            });
+        }
+
+        function showRecoveryUI() {
+            document.getElementById('authMainUI').classList.add('hidden');
+            document.getElementById('recoveryActionUI').classList.remove('hidden');
+        }
+
+        async function executeRecovery() {
+            const email = document.getElementById('authEmail').value.toLowerCase();
+            const seedInput = document.getElementById('recoverySeedInput').value.trim().toLowerCase();
+            const newKey = document.getElementById('newMasterKey').value;
+            
+            let users = JSON.parse(localStorage.getItem('mm_users')) || {};
+            const user = users[email];
+
+            if(!user || user.seed !== seedInput) return alert("Recovery failed. Invalid seed or email.");
+            if(!newKey) return alert("New key required.");
+
+            user.hash = await hashPassword(newKey, user.salt);
+            localStorage.setItem('mm_users', JSON.stringify(users));
+            alert("Key Restored.");
+            login(email);
+        }
+
+        function login(email) {
+            localStorage.setItem('mm_session', JSON.stringify({ email, ts: Date.now() }));
             location.reload();
         }
 
         function logout() { localStorage.removeItem('mm_session'); location.reload(); }
 
-        const allUsers = JSON.parse(localStorage.getItem('mm_users')) || {};
-        const userData = currentUser ? allUsers[currentUser] : null;
-
-        // TABS
+        // --- APP LOGIC ---
         function switchTab(mode) {
-            ['search', 'decks', 'vault', 'profile', 'members'].forEach(m => {
-                const el = document.getElementById(`${m}View`);
-                if(el) el.classList.toggle('hidden', m !== mode);
+            ['search', 'vault', 'members', 'profile'].forEach(m => {
+                document.getElementById(`${m}View`).classList.toggle('hidden', m !== mode);
                 const btn = document.getElementById(`tab${m.charAt(0).toUpperCase()+m.slice(1)}`);
                 if(btn) btn.classList.toggle('active-tab', m === mode);
             });
-            if(mode === 'members') renderMembers();
             if(mode === 'vault') renderVault();
-            if(mode === 'decks') renderDecks();
             if(mode === 'profile') renderProfile();
+            if(mode === 'members') renderMembers();
         }
 
-        // SEARCH
+        // --- DATABASE ---
         document.getElementById('dbSearch').addEventListener('keypress', async (e) => {
             if(e.key === 'Enter') {
-                const query = e.target.value;
-                const res = await fetch(`https://api.scryfall.com/cards/search?q=${encodeURIComponent(query)}`);
+                const res = await fetch(`https://api.scryfall.com/cards/search?q=${encodeURIComponent(e.target.value)}`);
                 const data = await res.json();
                 if(data.data) renderList(data.data);
             }
         });
 
         function renderList(cards) {
-            const container = document.getElementById('listContainer');
-            container.innerHTML = cards.map(c => {
-                const price = (parseFloat(c.prices.usd || 0) * rates.GBP).toFixed(2);
-                return `
-                    <div onclick='showCard(${JSON.stringify(c).replace(/'/g, "&apos;")})' class="p-4 bg-slate-900 border border-white/5 rounded-2xl flex justify-between items-center cursor-pointer hover:border-blue-500/40 transition-all group">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-lg bg-slate-950 flex items-center justify-center font-bold text-[10px] text-slate-500 group-hover:text-blue-400 transition-colors">${c.mana_cost || '0'}</div>
-                            <span class="text-[11px] font-black tracking-tight truncate w-32">${c.name}</span>
-                        </div>
-                        <span class="text-[10px] font-black text-white/50">£${price}</span>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        async function loadSetExplorer() {
-            const res = await fetch('https://api.scryfall.com/sets');
-            const data = await res.json();
-            document.getElementById('setList').innerHTML = data.data.slice(0, 12).map(s => `
-                <div onclick="browseSet('${s.code}')" title="${s.name}" class="aspect-square bg-slate-900 rounded-xl flex items-center justify-center cursor-pointer hover:bg-blue-600/20 border border-white/5 transition-all">
-                    <img src="${s.icon_svg_uri}" class="w-5 h-5 invert opacity-50">
+            document.getElementById('listContainer').innerHTML = cards.map(c => `
+                <div onclick='showCard(${JSON.stringify(c).replace(/'/g, "&apos;")})' class="p-4 bg-slate-900 border border-white/5 rounded-2xl flex justify-between cursor-pointer hover:border-blue-500/50">
+                    <span class="text-xs font-bold truncate w-40">${c.name}</span>
+                    <span class="text-[10px] text-blue-400">£${(parseFloat(c.prices.usd || 0) * rates.GBP).toFixed(2)}</span>
                 </div>
             `).join('');
         }
 
-        async function browseSet(code) {
-            const res = await fetch(`https://api.scryfall.com/cards/search?q=set:${code}`);
-            const data = await res.json();
-            renderList(data.data);
-        }
-
         function showCard(card) {
             activeCard = card;
-            document.getElementById('emptyView').classList.add('hidden');
             document.getElementById('cardContent').classList.remove('hidden');
             document.getElementById('displayImg').src = card.image_uris?.normal || card.card_faces[0].image_uris.normal;
             document.getElementById('displayName').innerText = card.name;
             document.getElementById('displaySet').innerText = card.set_name;
             document.getElementById('displayPrice').innerText = `£${(parseFloat(card.prices.usd || 0) * rates.GBP).toFixed(2)}`;
             document.getElementById('displayCMC').innerText = card.cmc || 0;
-            document.getElementById('displayRarity').innerText = card.rarity[0];
-            
-            const lgs = (f) => card.legalities[f] === 'legal' ? 'text-emerald-500' : 'text-rose-500';
-            document.getElementById('legStandard').className = `text-[10px] font-black uppercase ${lgs('standard')}`;
-            document.getElementById('legEDH').className = `text-[10px] font-black uppercase ${lgs('commander')}`;
-            
+            document.getElementById('displayType').innerText = card.type_line;
             renderChart(parseFloat(card.prices.usd || 0));
         }
 
-        // VAULT & SAVING
-        function save() {
-            allUsers[currentUser] = userData;
-            localStorage.setItem('mm_users', JSON.stringify(allUsers));
-        }
-
         function addToVault() {
-            userData.vault.push({ id: Date.now(), name: activeCard.name, price: parseFloat(activeCard.prices.usd || 0), type: activeCard.type_line, img: activeCard.image_uris?.small || activeCard.card_faces[0].image_uris.small });
-            save(); 
-            addTickerEvent(`User '${currentUser.split('@')[0]}' added ${activeCard.name} to their Vault.`);
-            alert("Secured in Vault.");
+            const users = JSON.parse(localStorage.getItem('mm_users'));
+            users[currentUser].vault.push({ id: Date.now(), name: activeCard.name, price: parseFloat(activeCard.prices.usd || 0), img: activeCard.image_uris?.small || activeCard.card_faces[0].image_uris.small });
+            localStorage.setItem('mm_users', JSON.stringify(users));
+            alert("Secured.");
         }
 
         function renderVault() {
-            const type = document.getElementById('vType').value;
-            const filtered = userData.vault.filter(c => type === 'all' || c.type.includes(type));
-            document.getElementById('vaultGrid').innerHTML = filtered.map(c => `
-                <div class="relative group rounded-[24px] overflow-hidden border border-white/10 shadow-2xl">
+            const users = JSON.parse(localStorage.getItem('mm_users'));
+            document.getElementById('vaultGrid').innerHTML = users[currentUser].vault.map(c => `
+                <div class="rounded-2xl overflow-hidden border border-white/5 relative group">
                     <img src="${c.img}" class="w-full">
-                    <div class="absolute inset-0 bg-slate-950/80 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center p-4 transition-all scale-95 group-hover:scale-100">
-                        <p class="text-xs font-black text-blue-400">£${(c.price * rates.GBP).toFixed(2)}</p>
-                        <button onclick="removeCard(${c.id})" class="mt-4 text-[9px] font-black uppercase tracking-widest text-rose-500 hover:text-rose-400">Remove Asset</button>
-                    </div>
                 </div>
             `).join('');
         }
 
-        function removeCard(id) {
-            userData.vault = userData.vault.filter(i => i.id !== id);
-            save(); renderVault();
-        }
-
-        // NETWORK VIEW
         function renderMembers() {
+            const users = JSON.parse(localStorage.getItem('mm_users'));
             const list = document.getElementById('memberList');
             list.innerHTML = '';
-            let totalVal = 0;
-            
-            const memberArr = Object.keys(allUsers).map(email => {
-                const worth = allUsers[email].vault.reduce((s, c) => s + c.price, 0) * rates.GBP;
-                totalVal += worth;
-                return { email, worth, count: allUsers[email].vault.length, decks: allUsers[email].decks.length };
-            }).sort((a,b) => b.worth - a.worth);
-
-            memberArr.forEach((m, i) => {
+            Object.keys(users).forEach(email => {
+                const val = users[email].vault.reduce((s, c) => s + c.price, 0) * rates.GBP;
                 list.innerHTML += `
-                    <tr class="hover:bg-white/5 transition-colors border-b border-white/5">
-                        <td class="p-6 font-black text-slate-600">#${(i+1).toString().padStart(2, '0')}</td>
-                        <td class="font-black text-sm text-white">${m.email.split('@')[0]} ${m.email === currentUser ? '<span class="text-blue-500 text-[10px] ml-2">(YOU)</span>' : ''}</td>
-                        <td class="font-black text-emerald-400 text-sm">£${m.worth.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
-                        <td class="text-center font-bold text-slate-500 text-xs">${m.decks}</td>
-                        <td class="text-right pr-10">
-                            <span class="px-2 py-1 rounded-md bg-slate-900 border border-white/10 text-[9px] font-black text-slate-500 uppercase">Online</span>
-                        </td>
-                    </tr>
+                    <div class="glass p-6 rounded-3xl border border-white/5 flex justify-between items-center">
+                        <span class="font-black text-sm">${email.split('@')[0]}</span>
+                        <span class="text-emerald-400 font-black">£${val.toFixed(2)}</span>
+                    </div>
                 `;
             });
-            document.getElementById('netTotalValue').innerText = `£${totalVal.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
         }
 
-        // PROFILE
         function renderProfile() {
-            const worth = userData.vault.reduce((s, c) => s + c.price, 0) * rates.GBP;
-            document.getElementById('userName').innerText = currentUser.split('@')[0];
+            const users = JSON.parse(localStorage.getItem('mm_users'));
+            const u = users[currentUser];
+            const worth = u.vault.reduce((s, c) => s + c.price, 0) * rates.GBP;
+            document.getElementById('profName').innerText = currentUser.split('@')[0];
             document.getElementById('userAvatar').innerText = currentUser[0].toUpperCase();
             document.getElementById('profAvatar').innerText = currentUser[0].toUpperCase();
-            document.getElementById('profName').innerText = currentUser.split('@')[0];
             document.getElementById('profileStats').innerHTML = `
-                <div class="bg-slate-950 p-10 rounded-[40px] border border-white/5 shadow-inner">
-                    <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-2">Market Liquidity</p>
-                    <h3 class="text-4xl font-black text-emerald-400">£${worth.toFixed(2)}</h3>
+                <div class="bg-slate-950 p-10 rounded-[40px] border border-white/5 text-center">
+                    <p class="text-[10px] text-slate-500 font-black uppercase mb-2">Net Worth</p>
+                    <p class="text-4xl font-black text-emerald-400">£${worth.toFixed(2)}</p>
                 </div>
-                <div class="bg-slate-950 p-10 rounded-[40px] border border-white/5 shadow-inner">
-                    <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-2">Total Collection</p>
-                    <h3 class="text-4xl font-black text-blue-400">${userData.vault.length} <span class="text-lg">ITEMS</span></h3>
+                <div class="bg-slate-950 p-10 rounded-[40px] border border-white/5 text-center">
+                    <p class="text-[10px] text-slate-500 font-black uppercase mb-2">Assets</p>
+                    <p class="text-4xl font-black text-blue-400">${u.vault.length}</p>
                 </div>
-                <div class="bg-slate-950 p-10 rounded-[40px] border border-white/5 shadow-inner">
-                    <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-2">Network Rank</p>
-                    <h3 class="text-4xl font-black text-violet-400">Elite</h3>
+                <div class="bg-slate-950 p-10 rounded-[40px] border border-white/5 text-center">
+                    <p class="text-[10px] text-slate-500 font-black uppercase mb-2">Security</p>
+                    <p class="text-4xl font-black text-violet-400">Level 3</p>
                 </div>
             `;
-        }
-
-        function generatePublicLink() {
-            const data = { name: currentUser.split('@')[0], vault: userData.vault };
-            const link = `${window.location.origin}${window.location.pathname}#view:${btoa(JSON.stringify(data))}`;
-            navigator.clipboard.writeText(link);
-            alert("Archive Access Link copied to clipboard.");
-        }
-
-        // DECK LOGIC (BASIC)
-        function createNewDeck() {
-            const name = prompt("Enter Project Name:");
-            if(!name) return;
-            userData.decks.push({ id: Date.now(), name, cards: [] });
-            save(); renderDecks();
-        }
-
-        function renderDecks() {
-            const grid = document.getElementById('decksGrid');
-            grid.innerHTML = userData.decks.map(d => `
-                <div class="glass p-8 rounded-[32px] border border-white/5 hover:border-blue-500/30 transition-all cursor-pointer group">
-                    <div class="flex justify-between items-start mb-6">
-                        <h4 class="text-2xl font-black tracking-tighter">${d.name}</h4>
-                        <button onclick="deleteDeck(${d.id})" class="text-slate-600 hover:text-rose-500 transition-colors"><i data-lucide="trash-2" size="16"></i></button>
-                    </div>
-                    <div class="flex items-center gap-4">
-                        <div class="bg-slate-950 px-3 py-1 rounded-lg text-[10px] font-black text-blue-500 uppercase">${d.cards.length} Cards</div>
-                        <div class="text-[10px] font-black text-slate-600 uppercase tracking-widest">Active Project</div>
-                    </div>
-                </div>
-            `).join('');
-            updateDeckSelects();
-            lucide.createIcons();
-        }
-
-        function updateDeckSelects() {
-            const sel = document.getElementById('deckAssignSelect');
-            sel.innerHTML = '<option>Assign to Project...</option>' + userData.decks.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
-        }
-
-        function addCardToDeck(id) {
-            const deck = userData.decks.find(d => d.id == id);
-            deck.cards.push({ name: activeCard.name, price: parseFloat(activeCard.prices.usd || 0) });
-            save();
-            alert(`Added to ${deck.name}`);
-        }
-
-        // MISC
-        function addTickerEvent(msg) {
-            const ticker = document.getElementById('tickerText');
-            ticker.innerHTML = `${msg} • ` + ticker.innerHTML;
         }
 
         function renderChart(base) {
             const ctx = document.getElementById('priceChart').getContext('2d');
             if(pChart) pChart.destroy();
-            const points = [base*0.92, base*1.05, base*0.98, base*1.15, base*1.02, base*1.1, base];
-            pChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['MON','TUE','WED','THU','FRI','SAT','SUN'],
-                    datasets: [{
-                        data: points,
-                        borderColor: '#3b82f6',
-                        borderWidth: 4,
-                        tension: 0.4,
-                        fill: true,
-                        backgroundColor: (context) => {
-                            const gradient = context.chart.ctx.createLinearGradient(0, 0, 0, 300);
-                            gradient.addColorStop(0, 'rgba(59, 130, 246, 0.2)');
-                            gradient.addColorStop(1, 'rgba(59, 130, 246, 0)');
-                            return gradient;
-                        },
-                        pointRadius: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { display: false },
-                        x: { grid: { display: false }, ticks: { color: '#475569', font: { size: 9, weight: '800' } } }
-                    }
-                }
-            });
+            pChart = new Chart(ctx, { type: 'line', data: { labels: ['D1','D2','D3','D4','D5','D6','D7'], datasets: [{ data: [base*0.9, base*0.95, base*1.1, base, base*1.05, base*0.98, base], borderColor: '#3b82f6', tension: 0.4, fill: true, backgroundColor: 'rgba(59,130,246,0.05)', pointRadius: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#475569', font: { size: 9, weight: '800' } } } } } });
         }
 
-        // INITIALIZE
         function init() {
-            const hash = window.location.hash;
-            if(hash.startsWith('#view:')) {
-                const data = JSON.parse(atob(hash.replace('#view:', '')));
-                switchTab('profile');
-                document.getElementById('authModal').classList.add('hidden');
-                document.getElementById('profName').innerText = `${data.name}'s Archive`;
-                document.getElementById('profJoined').innerText = "Guest Viewing Mode";
-                userData.vault = data.vault; renderVault();
-                return;
-            }
-            if(!currentUser) document.getElementById('authModal').classList.remove('hidden');
-            else { 
-                loadSetExplorer();
-                switchTab('search'); 
+            const session = JSON.parse(localStorage.getItem('mm_session'));
+            if(session && (Date.now() - session.ts < 86400000)) {
+                currentUser = session.email;
+                document.getElementById('userName').innerText = currentUser.split('@')[0];
+                document.getElementById('userAvatar').innerText = currentUser[0].toUpperCase();
+                switchTab('search');
+            } else {
+                document.getElementById('authModal').classList.remove('hidden');
             }
             lucide.createIcons();
         }
