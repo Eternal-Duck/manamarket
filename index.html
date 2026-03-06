@@ -3,338 +3,298 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ManaMarket Nexus Prime</title>
+    <title>ManaMarket Nexus Prime | Infinite</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; color: #f1f5f9; }
         .glass { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(24px); border: 1px solid rgba(255,255,255,0.08); }
-        .active-tab { color: #3b82f6; position: relative; }
-        .active-tab::after { content: ''; position: absolute; bottom: -8px; left: 0; width: 100%; height: 3px; background: #3b82f6; border-radius: 2px; }
-        .custom-scroll::-webkit-scrollbar { width: 5px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
-        .post-card:hover { transform: translateY(-2px); border-color: rgba(59, 130, 246, 0.3); }
+        .active-tab { color: #3b82f6; border-bottom: 3px solid #3b82f6; }
+        .pack-gradient { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .pack-gradient:hover { transform: scale(1.02); border-color: rgba(59,130,246,0.5); }
+        .card-reveal { animation: cardPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; opacity: 0; }
+        @keyframes cardPop { from { transform: translateY(30px) scale(0.8); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+        .foil-shimmer { position: relative; overflow: hidden; }
+        .foil-shimmer::after { content: ''; position: absolute; top: -150%; left: -150%; width: 300%; height: 300%; background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent); transform: rotate(45deg); animation: shimmer 3s infinite; }
+        @keyframes shimmer { 0% { left: -150%; } 100% { left: 150%; } }
     </style>
 </head>
-<body class="p-4 lg:p-8 min-h-screen">
-
-    <div id="authModal" class="fixed inset-0 z-[100] bg-slate-950/98 backdrop-blur-2xl flex items-center justify-center p-6 hidden">
-        <div class="glass max-w-md w-full p-10 rounded-[40px] border border-white/10 shadow-2xl text-center">
-            <div class="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl rotate-3"><i data-lucide="shield-check" class="text-white" size="32"></i></div>
-            <h2 class="text-3xl font-black tracking-tighter mb-8">Nexus Prime Login</h2>
-            <div class="space-y-4">
-                <input type="email" id="authEmail" placeholder="archivist@nexus.io" class="w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 outline-none focus:ring-2 focus:ring-blue-500">
-                <input type="password" id="authPass" placeholder="Master Key" class="w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 outline-none focus:ring-2 focus:ring-blue-500">
-                <button onclick="handleAuthAction()" class="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-2xl font-black uppercase tracking-widest text-xs transition-all">Establish Link</button>
-                <button onclick="toggleAuthMode()" class="text-[10px] text-slate-500 font-black uppercase tracking-widest mt-4">Create New Identity</button>
-            </div>
-        </div>
-    </div>
+<body class="p-4 lg:p-8">
 
     <div class="max-w-[1600px] mx-auto">
-        <header class="flex flex-col lg:flex-row justify-between items-center mb-8 gap-6 glass p-6 rounded-[32px] border-white/5 shadow-2xl">
+        <header class="flex flex-col lg:flex-row justify-between items-center mb-8 glass p-6 rounded-[32px]">
             <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg"><i data-lucide="layers" class="text-white"></i></div>
-                <h1 class="text-2xl font-black tracking-tighter">Nexus <span class="text-blue-500 text-lg">v3.5</span></h1>
+                <div class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg"><i data-lucide="sparkles" class="text-white"></i></div>
+                <h1 class="text-2xl font-black tracking-tighter">Nexus <span class="text-blue-500">Infinite</span></h1>
             </div>
-            
-            <nav class="flex gap-8 text-[11px] font-black uppercase tracking-widest text-slate-500">
-                <button onclick="switchTab('plaza')" id="tabPlaza" class="active-tab flex items-center gap-2"><i data-lucide="message-square" size="14"></i> The Plaza</button>
-                <button onclick="switchTab('search')" id="tabSearch" class="flex items-center gap-2"><i data-lucide="search" size="14"></i> Terminal</button>
-                <button onclick="switchTab('decks')" id="tabDecks" class="flex items-center gap-2"><i data-lucide="layout" size="14"></i> Architect</button>
-                <button onclick="switchTab('vault')" id="tabVault" class="flex items-center gap-2"><i data-lucide="archive" size="14"></i> Vault</button>
-                <button onclick="switchTab('admin')" id="tabAdmin" class="hidden text-rose-500 bg-rose-500/10 px-4 py-1 rounded-full border border-rose-500/20">Admin</button>
+            <nav id="mainNav" class="flex gap-8 text-[11px] font-black uppercase tracking-widest text-slate-500">
+                <button onclick="switchTab('plaza')" class="active-tab py-2">Plaza</button>
+                <button onclick="switchTab('sets')" class="py-2">Expansions</button>
+                <button onclick="switchTab('packs')" class="py-2 text-amber-400">Pack Opening</button>
+                <button onclick="switchTab('vault')" class="py-2">Vault</button>
+                <button onclick="switchTab('admin')" id="adminTab" class="hidden text-rose-500">Admin</button>
             </nav>
-
-            <div class="flex items-center gap-4 bg-slate-950/50 p-2 pr-5 rounded-2xl border border-white/5 cursor-pointer" onclick="switchTab('profile')">
-                <div id="userAvatar" class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-black text-xs">?</div>
-                <div class="text-left"><p id="userName" class="text-sm font-black text-white leading-none">Guest</p></div>
+            <div id="userDisplay" class="flex items-center gap-4">
+                <div class="text-right"><p id="userName" class="text-sm font-black">Archivist</p><p class="text-[9px] text-slate-500 uppercase">Lvl 42 Rogue</p></div>
+                <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center font-black">A</div>
             </div>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <aside class="lg:col-span-3 space-y-6">
-                <div class="glass rounded-[32px] p-6 border border-white/5">
-                    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-6 flex items-center gap-2">
-                        <i data-lucide="globe" size="12"></i> Set Explorer
-                    </h3>
-                    <div id="setGrid" class="grid grid-cols-4 gap-3 overflow-y-auto max-h-[400px] custom-scroll pr-2">
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <section id="plazaView" class="lg:col-span-12 space-y-6">
+                <div class="flex justify-between items-end">
+                    <h2 class="text-4xl font-black tracking-tighter">The <span class="text-blue-500">Plaza</span></h2>
+                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Global Activity Feed</p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                    <div class="lg:col-span-3 space-y-6">
+                        <div class="glass p-6 rounded-[32px] border-blue-500/20 bg-blue-500/5">
+                            <textarea id="plazaInput" placeholder="What's happening in your multiverse?" class="w-full bg-transparent border-none outline-none text-sm font-medium h-20 resize-none"></textarea>
+                            <div class="flex justify-between mt-4">
+                                <div class="flex gap-2">
+                                    <button class="p-2 hover:bg-white/5 rounded-lg text-slate-400"><i data-lucide="image" size="18"></i></button>
+                                    <button class="p-2 hover:bg-white/5 rounded-lg text-slate-400"><i data-lucide="link" size="18"></i></button>
+                                </div>
+                                <button onclick="postToPlaza()" class="bg-blue-600 px-8 py-2 rounded-xl text-[10px] font-black uppercase">Post Message</button>
+                            </div>
                         </div>
-                </div>
-
-                <div class="glass rounded-[32px] p-6 border border-white/5">
-                    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4">Network Stats</h3>
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center"><span class="text-xs text-slate-400">Archivists</span><span id="statUsers" class="text-xs font-black">0</span></div>
-                        <div class="flex justify-between items-center"><span class="text-xs text-slate-400">Global Cards</span><span id="statCards" class="text-xs font-black">0</span></div>
-                    </div>
-                </div>
-            </aside>
-
-            <section class="lg:col-span-9 space-y-8">
-                
-                <div id="plazaView" class="space-y-6">
-                    <div class="glass p-6 rounded-[32px] border border-blue-500/20 bg-blue-500/5">
-                        <div class="flex gap-4">
-                            <div class="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center"><i data-lucide="pen-tool" class="text-slate-400"></i></div>
-                            <input type="text" id="postInput" placeholder="Share a pull or deck idea to the Nexus..." class="flex-1 bg-transparent border-none outline-none text-sm font-medium" onkeypress="if(e.key === 'Enter') createPost()">
-                            <button onclick="createPost()" class="bg-blue-600 px-6 py-2 rounded-xl text-[10px] font-black uppercase">Post</button>
-                        </div>
-                    </div>
-                    <div id="feedContainer" class="space-y-4">
-                        </div>
-                </div>
-
-                <div id="searchView" class="hidden glass rounded-[40px] p-8 border border-white/5">
-                    <div class="flex gap-4 mb-8">
-                        <div class="relative flex-1">
-                            <input type="text" id="dbSearch" placeholder="Search the Multiverse Database..." class="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 pl-14 outline-none focus:ring-2 focus:ring-blue-500">
-                            <i data-lucide="search" class="absolute left-5 top-5 text-slate-500"></i>
-                        </div>
-                    </div>
-                    <div id="searchGrid" class="grid grid-cols-2 md:grid-cols-4 gap-6"></div>
-                </div>
-
-                <div id="decksView" class="hidden glass rounded-[40px] p-10 border border-white/5">
-                    <div class="flex justify-between items-center mb-10">
-                        <h2 class="text-5xl font-black tracking-tighter">Deck <span class="text-blue-500">Architect</span></h2>
-                        <button onclick="createNewDeck()" class="bg-blue-600 px-6 py-3 rounded-xl text-[10px] font-black uppercase">+ New Build</button>
-                    </div>
-                    <div id="decksGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
-                </div>
-
-                <div id="vaultView" class="hidden glass rounded-[40px] p-10 border border-white/5">
-                    <h2 class="text-5xl font-black mb-10 tracking-tighter">Your <span class="text-emerald-500">Vault</span></h2>
-                    <div id="vaultGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6"></div>
-                </div>
-
-                <div id="adminView" class="hidden glass rounded-[40px] p-10 border border-rose-500/20">
-                    <h2 class="text-4xl font-black text-rose-500 mb-8">Command Center</h2>
-                    <div class="grid grid-cols-2 gap-8 mb-8">
-                        <div class="bg-slate-950 p-6 rounded-3xl border border-white/5">
-                            <h4 class="text-[10px] font-black text-slate-500 uppercase mb-4">Broadcast System</h4>
-                            <input type="text" id="adminBroadcast" placeholder="Type global announcement..." class="w-full bg-slate-900 p-4 rounded-xl text-sm border border-slate-800 outline-none mb-4">
-                            <button onclick="sendBroadcast()" class="w-full bg-rose-600 py-3 rounded-xl text-[10px] font-black uppercase">Send to Network</button>
-                        </div>
-                        <div id="adminUserList" class="bg-slate-950 p-6 rounded-3xl border border-white/5 overflow-y-auto max-h-[300px]">
+                        <div id="plazaFeed" class="space-y-4">
                             </div>
                     </div>
+                    <div class="space-y-6">
+                        <div class="glass p-6 rounded-[32px]">
+                            <h3 class="text-[10px] font-black text-slate-500 uppercase mb-4 tracking-widest">Trending Sub-Plazas</h3>
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-3 p-2 hover:bg-white/5 rounded-xl cursor-pointer">
+                                    <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-500 flex items-center justify-center"><i data-lucide="trending-up" size="14"></i></div>
+                                    <span class="text-xs font-bold">r/MKM_Speculation</span>
+                                </div>
+                                <div class="flex items-center gap-3 p-2 hover:bg-white/5 rounded-xl cursor-pointer">
+                                    <div class="w-8 h-8 rounded-lg bg-orange-500/20 text-orange-500 flex items-center justify-center"><i data-lucide="flame" size="14"></i></div>
+                                    <span class="text-xs font-bold">r/GodPulls</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
             </section>
-        </div>
+
+            <section id="packsView" class="hidden lg:col-span-12 space-y-8 text-center">
+                <div class="max-w-2xl mx-auto py-20" id="packIntro">
+                    <div class="w-48 h-72 mx-auto pack-gradient rounded-[24px] border-2 border-white/10 flex items-center justify-center shadow-2xl mb-10 cursor-pointer" onclick="openPack()">
+                        <div class="text-center">
+                            <i data-lucide="package-open" class="text-blue-500 mx-auto mb-4" size="48"></i>
+                            <p class="text-[10px] font-black uppercase tracking-widest">Play Booster</p>
+                            <p class="text-[8px] text-slate-500">Tap to Crack</p>
+                        </div>
+                    </div>
+                    <h2 class="text-5xl font-black tracking-tighter">Crack a <span class="text-blue-500">Play Booster</span></h2>
+                    <p class="text-slate-500 mt-4 text-sm">Every pack includes 14 cards from the latest sets, following official rarity distribution.</p>
+                </div>
+                
+                <div id="packReveal" class="hidden grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+                    </div>
+                <div id="packActions" class="hidden pt-10">
+                    <button onclick="resetPack()" class="bg-slate-800 px-8 py-3 rounded-xl text-xs font-black uppercase mx-2">Discard Wrap</button>
+                    <button onclick="vaultAllPack()" class="bg-blue-600 px-8 py-3 rounded-xl text-xs font-black uppercase mx-2">Vault All</button>
+                </div>
+            </section>
+
+            <section id="setsView" class="hidden lg:col-span-12">
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4" id="setsFullGrid">
+                    </div>
+            </section>
+
+            <section id="adminView" class="hidden lg:col-span-12 glass p-10 rounded-[40px] border-rose-500/30">
+                <div class="flex justify-between mb-10">
+                    <h2 class="text-4xl font-black text-rose-500">The High Table</h2>
+                    <button onclick="clearNetwork()" class="bg-rose-600 px-6 py-2 rounded-xl text-[10px] font-black uppercase">Wipe Network</button>
+                </div>
+                <div class="bg-slate-950 rounded-2xl overflow-hidden border border-white/5">
+                    <table class="w-full text-left">
+                        <thead class="text-[10px] text-slate-500 font-black uppercase bg-white/5"><tr class="p-4 border-b border-white/5">
+                            <th class="p-6">User</th><th>Vault Size</th><th>Last Seen</th><th>Action</th>
+                        </tr></thead>
+                        <tbody id="adminUserTable" class="text-sm"></tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
     </div>
 
     <script>
         const ADMIN_EMAIL = "admin@manamarket.io";
-        let currentUser = null, userData = null;
+        let currentUser = "admin@manamarket.io"; // Default for demo
+        let openedCards = [];
 
-        // --- CORE ENGINE ---
-        function switchTab(mode) {
-            ['plaza', 'search', 'decks', 'vault', 'admin', 'profile'].forEach(m => {
-                const view = document.getElementById(`${m}View`);
-                if(view) view.classList.toggle('hidden', m !== mode);
-                const tab = document.getElementById(`tab${m.charAt(0).toUpperCase()+m.slice(1)}`);
-                if(tab) tab.classList.toggle('active-tab', m === mode);
-            });
-            if(mode === 'plaza') renderPlaza();
-            if(mode === 'decks') renderDecks();
-            if(mode === 'vault') renderVault();
-            if(mode === 'admin') renderAdmin();
+        // --- NAVIGATION ---
+        function switchTab(tabId) {
+            document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(`${tabId}View`).classList.remove('hidden');
+            document.querySelectorAll('#mainNav button').forEach(b => b.classList.remove('active-tab'));
+            event.target.classList.add('active-tab');
+            if(tabId === 'sets') loadAllSets();
+            if(tabId === 'plaza') renderPlaza();
+            if(tabId === 'admin') renderAdmin();
         }
 
-        // --- SOCIAL (PLAZA) ---
-        function createPost() {
-            const text = document.getElementById('postInput').value;
-            if(!text) return;
+        // --- ALL SETS BROWSER ---
+        async function loadAllSets() {
+            const res = await fetch('https://api.scryfall.com/sets');
+            const data = await res.json();
+            const grid = document.getElementById('setsFullGrid');
+            grid.innerHTML = data.data.map(set => `
+                <div class="glass p-6 rounded-3xl border border-white/5 hover:border-blue-500/50 transition-all cursor-pointer group text-center">
+                    <img src="${set.icon_svg_uri}" class="w-10 h-10 mx-auto invert mb-4 opacity-50 group-hover:opacity-100">
+                    <p class="text-[10px] font-black uppercase tracking-tighter truncate">${set.name}</p>
+                    <p class="text-[8px] text-slate-500 font-bold mt-1">${set.released_at.split('-')[0]} • ${set.card_count} Cards</p>
+                </div>
+            `).join('');
+        }
+
+        // --- PACK OPENING MINIGAME ---
+        async function openPack() {
+            document.getElementById('packIntro').classList.add('hidden');
+            document.getElementById('packReveal').classList.remove('hidden');
+            document.getElementById('packReveal').innerHTML = `<div class="col-span-full py-20 text-blue-500 font-black animate-pulse">Decrypting Pack Data...</div>`;
+            
+            // Simplified logic: 1 Rare, 3 Uncommons, 10 Commons (approximation for the API fetch)
+            const queries = ['rarity:rare', 'rarity:uncommon', 'rarity:common'];
+            const [rares, uncommons, commons] = await Promise.all(queries.map(q => 
+                fetch(`https://api.scryfall.com/cards/random?q=${q}`).then(r => r.json())
+            ));
+
+            // Fetch extra cards for full booster simulation
+            const extraRes = await fetch(`https://api.scryfall.com/cards/search?q=rarity:common&unique=cards`);
+            const extraData = await extraRes.json();
+            
+            openedCards = [
+                rares, 
+                uncommons, 
+                ...extraData.data.slice(0, 10), 
+                { name: "Full Art Land", image_uris: { small: 'https://cards.scryfall.io/small/front/a/e/ae92e863-7140-4543-9831-27909249787e.jpg' } } 
+            ];
+
+            const revealGrid = document.getElementById('packReveal');
+            revealGrid.innerHTML = '';
+            
+            openedCards.forEach((card, i) => {
+                setTimeout(() => {
+                    const isFoil = i === 11; // 12th card is foil in Play Boosters
+                    revealGrid.innerHTML += `
+                        <div class="card-reveal ${isFoil ? 'foil-shimmer' : ''}">
+                            <img src="${card.image_uris?.normal || card.image_uris?.small || ''}" class="w-full rounded-xl border border-white/10 shadow-2xl">
+                        </div>
+                    `;
+                    lucide.createIcons();
+                }, i * 150);
+            });
+
+            setTimeout(() => {
+                document.getElementById('packActions').classList.remove('hidden');
+            }, openedCards.length * 150 + 500);
+        }
+
+        function resetPack() {
+            document.getElementById('packIntro').classList.remove('hidden');
+            document.getElementById('packReveal').classList.add('hidden');
+            document.getElementById('packActions').classList.add('hidden');
+        }
+
+        function vaultAllPack() {
+            let users = JSON.parse(localStorage.getItem('mm_users')) || {};
+            if(!users[currentUser]) users[currentUser] = { vault: [] };
+            openedCards.forEach(c => users[currentUser].vault.push({ name: c.name, img: c.image_uris?.small }));
+            localStorage.setItem('mm_users', JSON.stringify(users));
+            alert("All cards secured in your personal vault.");
+            resetPack();
+        }
+
+        // --- PLAZA EXPANSION ---
+        function postToPlaza() {
+            const content = document.getElementById('plazaInput').value;
+            if(!content) return;
             const posts = JSON.parse(localStorage.getItem('mm_posts')) || [];
             posts.unshift({
                 id: Date.now(),
                 user: currentUser.split('@')[0],
-                content: text,
+                content: content,
                 likes: 0,
-                ts: new Date().toLocaleTimeString()
+                replies: 0,
+                time: "Just Now"
             });
             localStorage.setItem('mm_posts', JSON.stringify(posts));
-            document.getElementById('postInput').value = '';
+            document.getElementById('plazaInput').value = '';
             renderPlaza();
         }
 
         function renderPlaza() {
-            const posts = JSON.parse(localStorage.getItem('mm_posts')) || [];
-            const broadcast = localStorage.getItem('mm_broadcast');
-            const container = document.getElementById('feedContainer');
-            
-            let html = broadcast ? `
-                <div class="glass p-5 rounded-[24px] border-l-4 border-rose-500 bg-rose-500/5 animate-pulse">
-                    <p class="text-[10px] font-black text-rose-500 uppercase mb-1">System Broadcast</p>
-                    <p class="text-sm font-bold text-white">${broadcast}</p>
-                </div>
-            ` : '';
-
-            html += posts.map(p => `
-                <div class="glass p-6 rounded-[32px] border border-white/5 post-card transition-all">
-                    <div class="flex justify-between mb-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-black text-[10px]">${p.user[0].toUpperCase()}</div>
-                            <span class="text-xs font-black uppercase tracking-widest">${p.user}</span>
+            const posts = JSON.parse(localStorage.getItem('mm_posts')) || [
+                { user: "Jace_Official", content: "Just cracked a serialized Black Lotus from the new set! Who wants to trade?", likes: 42, replies: 5, time: "2h" },
+                { user: "ManaBurn_99", content: "The new Deck Architect is actually insane. Building a 5-color dragon deck right now.", likes: 12, replies: 2, time: "5h" }
+            ];
+            const feed = document.getElementById('plazaFeed');
+            feed.innerHTML = posts.map(p => `
+                <div class="glass p-6 rounded-[32px] border border-white/5 hover:border-white/10 transition-all">
+                    <div class="flex gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-blue-600/20 flex items-center justify-center text-blue-500 font-black text-xs">${p.user[0].toUpperCase()}</div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-black uppercase tracking-widest text-blue-400">u/${p.user}</span>
+                                <span class="text-[10px] text-slate-500 font-bold">${p.time}</span>
+                            </div>
+                            <p class="text-sm text-slate-300 mb-6 leading-relaxed">${p.content}</p>
+                            <div class="flex gap-6">
+                                <button class="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase hover:text-white"><i data-lucide="arrow-big-up" size="14"></i> ${p.likes}</button>
+                                <button class="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase hover:text-white"><i data-lucide="message-circle" size="14"></i> ${p.replies}</button>
+                                <button class="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase hover:text-white ml-auto"><i data-lucide="share" size="14"></i></button>
+                            </div>
                         </div>
-                        <span class="text-[10px] text-slate-600 font-bold">${p.ts}</span>
-                    </div>
-                    <p class="text-slate-300 text-sm leading-relaxed">${p.content}</p>
-                    <div class="mt-6 pt-4 border-t border-white/5 flex gap-6 text-[10px] font-black text-slate-500 uppercase">
-                        <button class="hover:text-blue-500 flex items-center gap-1"><i data-lucide="arrow-big-up" size="14"></i> Upvote</button>
-                        <button class="hover:text-white flex items-center gap-1"><i data-lucide="message-circle" size="14"></i> Comment</button>
                     </div>
                 </div>
             `).join('');
-            container.innerHTML = html;
             lucide.createIcons();
         }
 
-        // --- SET EXPLORER ---
-        async function loadSets() {
-            const res = await fetch('https://api.scryfall.com/sets');
-            const data = await res.json();
-            document.getElementById('setGrid').innerHTML = data.data.slice(0, 40).map(s => `
-                <div onclick="browseSet('${s.code}')" class="aspect-square glass rounded-xl flex items-center justify-center cursor-pointer hover:bg-blue-600/20 transition-all group" title="${s.name}">
-                    <img src="${s.icon_svg_uri}" class="w-6 h-6 invert opacity-40 group-hover:opacity-100">
-                </div>
-            `).join('');
-        }
-
-        async function browseSet(code) {
-            switchTab('search');
-            const res = await fetch(`https://api.scryfall.com/cards/search?q=set:${code}`);
-            const data = await res.json();
-            renderSearch(data.data);
-        }
-
-        // --- SEARCH ---
-        document.getElementById('dbSearch').addEventListener('keypress', async (e) => {
-            if(e.key === 'Enter') {
-                const res = await fetch(`https://api.scryfall.com/cards/search?q=${encodeURIComponent(e.target.value)}`);
-                const data = await res.json();
-                if(data.data) renderSearch(data.data);
-            }
-        });
-
-        function renderSearch(cards) {
-            document.getElementById('searchGrid').innerHTML = cards.slice(0, 20).map(c => `
-                <div class="relative group cursor-pointer" onclick="addToVaultDirect('${c.id}', '${c.name}', '${c.prices.usd}', '${c.image_uris?.normal || c.card_faces[0].image_uris.normal}')">
-                    <img src="${c.image_uris?.small || c.card_faces[0].image_uris.small}" class="w-full rounded-xl border border-white/10 group-hover:border-blue-500 transition-all">
-                    <div class="absolute inset-0 bg-blue-600/80 opacity-0 group-hover:opacity-100 flex items-center justify-center rounded-xl transition-all">
-                        <span class="text-[10px] font-black uppercase">Add to Vault</span>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // --- DECKS ---
-        function renderDecks() {
-            const decks = userData.decks || [];
-            document.getElementById('decksGrid').innerHTML = decks.map(d => `
-                <div class="glass p-8 rounded-[32px] border border-white/5">
-                    <div class="flex justify-between items-start mb-6">
-                        <h4 class="text-2xl font-black">${d.name}</h4>
-                        <div class="text-[10px] font-black text-blue-500 uppercase bg-blue-500/10 px-3 py-1 rounded-full">${d.cards.length} Cards</div>
-                    </div>
-                    <div class="h-20 flex items-end gap-1 mb-6">
-                        ${[2,5,8,3,4,6,2].map(h => `<div class="flex-1 bg-slate-800 rounded-t-sm" style="height: ${h*10}%"></div>`).join('')}
-                    </div>
-                    <button class="w-full py-3 bg-white/5 rounded-xl text-[10px] font-black uppercase hover:bg-white/10 transition-all">Open Builder</button>
-                </div>
-            `).join('');
-        }
-
-        function createNewDeck() {
-            const name = prompt("Deck Name:");
-            if(!name) return;
-            userData.decks.push({ id: Date.now(), name, cards: [] });
-            saveData();
-            renderDecks();
-        }
-
-        // --- ADMIN ---
-        function sendBroadcast() {
-            const msg = document.getElementById('adminBroadcast').value;
-            localStorage.setItem('mm_broadcast', msg);
-            alert("Broadcast live.");
-            renderPlaza();
-        }
-
+        // --- ADMIN PANEL ---
         function renderAdmin() {
             const users = JSON.parse(localStorage.getItem('mm_users')) || {};
-            document.getElementById('adminUserList').innerHTML = Object.keys(users).map(e => `
-                <div class="flex justify-between items-center py-3 border-b border-white/5">
-                    <span class="text-xs font-bold">${e}</span>
-                    <button onclick="deleteUser('${e}')" class="text-rose-500 text-[10px] font-black uppercase">Delete</button>
-                </div>
+            const table = document.getElementById('adminUserTable');
+            table.innerHTML = Object.keys(users).map(email => `
+                <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                    <td class="p-6 font-bold text-slate-200">${email}</td>
+                    <td class="p-6 text-blue-400 font-black">${users[email].vault?.length || 0} Items</td>
+                    <td class="p-6 text-slate-500 font-bold">Mar 06, 2026</td>
+                    <td class="p-6"><button onclick="deleteUser('${email}')" class="text-rose-500 font-black text-[10px] uppercase hover:underline">Terminate</button></td>
+                </tr>
             `).join('');
         }
 
-        // --- DATA MGMT ---
-        function addToVaultDirect(id, name, price, img) {
-            userData.vault.push({ id, name, price, img });
-            saveData();
-            alert(`Added ${name} to vault.`);
-        }
-
-        function renderVault() {
-            document.getElementById('vaultGrid').innerHTML = userData.vault.map(c => `
-                <img src="${c.img}" class="w-full rounded-xl border border-white/5 shadow-lg">
-            `).join('');
-        }
-
-        function saveData() {
-            const all = JSON.parse(localStorage.getItem('mm_users'));
-            all[currentUser] = userData;
-            localStorage.setItem('mm_users', JSON.stringify(all));
-            updateStats();
-        }
-
-        function updateStats() {
-            const all = JSON.parse(localStorage.getItem('mm_users')) || {};
-            document.getElementById('statUsers').innerText = Object.keys(all).length;
-            let totalCards = 0;
-            Object.values(all).forEach(u => totalCards += u.vault.length);
-            document.getElementById('statCards').innerText = totalCards;
-        }
-
-        // --- INIT ---
-        function init() {
-            const session = JSON.parse(localStorage.getItem('mm_session'));
-            if(session) {
-                currentUser = session.email;
-                const all = JSON.parse(localStorage.getItem('mm_users'));
-                userData = all[currentUser];
-                if(currentUser === ADMIN_EMAIL) document.getElementById('tabAdmin').classList.remove('hidden');
-                document.getElementById('userName').innerText = currentUser.split('@')[0];
-                document.getElementById('userAvatar').innerText = currentUser[0].toUpperCase();
-                loadSets();
-                updateStats();
-                switchTab('plaza');
-            } else {
-                document.getElementById('authModal').classList.remove('hidden');
+        function deleteUser(email) {
+            if(confirm("Confirm user termination? All data will be purged.")) {
+                let users = JSON.parse(localStorage.getItem('mm_users'));
+                delete users[email];
+                localStorage.setItem('mm_users', JSON.stringify(users));
+                renderAdmin();
             }
+        }
+
+        function clearNetwork() {
+            if(confirm("DANGER: Wiping all network data. Continue?")) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        // Initialize
+        function init() {
+            if(currentUser === ADMIN_EMAIL) document.getElementById('adminTab').classList.remove('hidden');
+            renderPlaza();
             lucide.createIcons();
         }
-
-        // Simplistic Auth for this demo
-        async function handleAuthAction() {
-            const email = document.getElementById('authEmail').value.toLowerCase();
-            const pass = document.getElementById('authPass').value;
-            let users = JSON.parse(localStorage.getItem('mm_users')) || {};
-            if(!users[email]) {
-                users[email] = { hash: pass, vault: [], decks: [], seed: 'demo-seed-word-list' };
-                localStorage.setItem('mm_users', JSON.stringify(users));
-            }
-            localStorage.setItem('mm_session', JSON.stringify({ email, ts: Date.now() }));
-            location.reload();
-        }
-
         init();
     </script>
 </body>
