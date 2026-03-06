@@ -3,354 +3,338 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ManaMarket Ultra | Sovereign Nexus</title>
+    <title>ManaMarket Nexus Prime</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; color: #f1f5f9; overflow-x: hidden; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; color: #f1f5f9; }
         .glass { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(24px); border: 1px solid rgba(255,255,255,0.08); }
         .active-tab { color: #3b82f6; position: relative; }
-        .active-tab::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 100%; height: 2px; background: #3b82f6; border-radius: 2px; }
-        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .active-tab::after { content: ''; position: absolute; bottom: -8px; left: 0; width: 100%; height: 3px; background: #3b82f6; border-radius: 2px; }
+        .custom-scroll::-webkit-scrollbar { width: 5px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
-        @keyframes pulse-border { 0%, 100% { border-color: rgba(59, 130, 246, 0.5); } 50% { border-color: rgba(59, 130, 246, 0.1); } }
-        .admin-glow { animation: pulse-border 2s infinite; }
+        .post-card:hover { transform: translateY(-2px); border-color: rgba(59, 130, 246, 0.3); }
     </style>
 </head>
-<body class="p-4 lg:p-8">
+<body class="p-4 lg:p-8 min-h-screen">
 
     <div id="authModal" class="fixed inset-0 z-[100] bg-slate-950/98 backdrop-blur-2xl flex items-center justify-center p-6 hidden">
-        <div class="glass max-w-md w-full p-10 rounded-[40px] border border-white/10 shadow-2xl">
-            <div id="authMainUI">
-                <div class="text-center mb-8">
-                    <div class="w-20 h-20 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl rotate-3">
-                        <i data-lucide="shield-check" class="text-white" size="32"></i>
-                    </div>
-                    <h2 id="authTitle" class="text-3xl font-black tracking-tighter">Nexus Encryption</h2>
-                    <p class="text-slate-500 text-sm mt-2">Access the Sovereign TCG Network</p>
-                </div>
-                <div class="space-y-4">
-                    <input type="email" id="authEmail" placeholder="Identity (Email)" class="w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium">
-                    <input type="password" id="authPass" placeholder="Master Key" class="w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                    <div id="registerFields" class="hidden"><input type="password" id="authPassConfirm" placeholder="Confirm Master Key" class="w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 outline-none"></div>
-                    <button onclick="handleAuthAction()" id="authMainBtn" class="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-2xl font-black uppercase tracking-widest text-xs transition-all">Decrypt</button>
-                    <div class="flex flex-col gap-3 mt-4">
-                        <button onclick="toggleAuthMode()" id="authSwitch" class="text-[10px] text-slate-500 font-black uppercase tracking-widest">New Identity</button>
-                        <button onclick="showRecoveryUI()" class="text-[10px] text-rose-500/50 font-black uppercase tracking-widest">Key Recovery</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="seedDisplayUI" class="hidden text-center">
-                <h3 class="text-2xl font-black mb-2">Recovery Seed</h3>
-                <p class="text-slate-500 text-xs mb-6">Write down these 12 words. They are your only bypass.</p>
-                <div id="seedGrid" class="grid grid-cols-3 gap-2 bg-slate-950 p-4 rounded-2xl mb-6 text-[10px] font-mono"></div>
-                <button onclick="location.reload()" class="w-full bg-white text-black py-4 rounded-2xl font-black uppercase text-xs">I have secured it</button>
-            </div>
-
-            <div id="recoveryActionUI" class="hidden">
-                <h3 class="text-2xl font-black mb-4 text-rose-500">Emergency Reset</h3>
-                <textarea id="recoverySeedInput" placeholder="Enter 12-word seed..." class="w-full h-32 bg-slate-950 border border-slate-800 rounded-2xl p-4 text-xs mb-4 outline-none"></textarea>
-                <input type="password" id="newMasterKey" placeholder="New Master Key" class="w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 mb-4">
-                <button onclick="executeRecovery()" class="w-full bg-rose-600 py-4 rounded-2xl font-black uppercase text-xs">Reset Key</button>
-                <button onclick="location.reload()" class="w-full text-slate-500 text-[10px] font-black uppercase mt-4">Cancel</button>
+        <div class="glass max-w-md w-full p-10 rounded-[40px] border border-white/10 shadow-2xl text-center">
+            <div class="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl rotate-3"><i data-lucide="shield-check" class="text-white" size="32"></i></div>
+            <h2 class="text-3xl font-black tracking-tighter mb-8">Nexus Prime Login</h2>
+            <div class="space-y-4">
+                <input type="email" id="authEmail" placeholder="archivist@nexus.io" class="w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 outline-none focus:ring-2 focus:ring-blue-500">
+                <input type="password" id="authPass" placeholder="Master Key" class="w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 outline-none focus:ring-2 focus:ring-blue-500">
+                <button onclick="handleAuthAction()" class="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-2xl font-black uppercase tracking-widest text-xs transition-all">Establish Link</button>
+                <button onclick="toggleAuthMode()" class="text-[10px] text-slate-500 font-black uppercase tracking-widest mt-4">Create New Identity</button>
             </div>
         </div>
     </div>
 
-    <div class="max-w-[1700px] mx-auto pt-6">
-        <header class="flex flex-col lg:flex-row justify-between items-center mb-10 gap-6 glass p-6 rounded-[32px] border-white/5 shadow-2xl">
-            <div class="flex items-center gap-5 cursor-pointer" onclick="location.href=location.pathname">
-                <div class="w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg"><i data-lucide="zap" class="text-white"></i></div>
-                <div><h1 class="text-2xl font-black tracking-tight">ManaMarket <span class="text-blue-500">Nexus</span></h1></div>
+    <div class="max-w-[1600px] mx-auto">
+        <header class="flex flex-col lg:flex-row justify-between items-center mb-8 gap-6 glass p-6 rounded-[32px] border-white/5 shadow-2xl">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg"><i data-lucide="layers" class="text-white"></i></div>
+                <h1 class="text-2xl font-black tracking-tighter">Nexus <span class="text-blue-500 text-lg">v3.5</span></h1>
             </div>
+            
             <nav class="flex gap-8 text-[11px] font-black uppercase tracking-widest text-slate-500">
-                <button onclick="switchTab('search')" id="tabSearch" class="active-tab">Terminal</button>
-                <button onclick="switchTab('vault')" id="tabVault">Vault</button>
-                <button onclick="switchTab('social')" id="tabSocial">Social Hub</button>
-                <button onclick="switchTab('profile')" id="tabProfile" class="text-violet-400">Dashboard</button>
-                <button onclick="switchTab('admin')" id="tabAdmin" class="hidden text-rose-500 border border-rose-500/20 px-4 py-1 rounded-full bg-rose-500/5">Command Center</button>
+                <button onclick="switchTab('plaza')" id="tabPlaza" class="active-tab flex items-center gap-2"><i data-lucide="message-square" size="14"></i> The Plaza</button>
+                <button onclick="switchTab('search')" id="tabSearch" class="flex items-center gap-2"><i data-lucide="search" size="14"></i> Terminal</button>
+                <button onclick="switchTab('decks')" id="tabDecks" class="flex items-center gap-2"><i data-lucide="layout" size="14"></i> Architect</button>
+                <button onclick="switchTab('vault')" id="tabVault" class="flex items-center gap-2"><i data-lucide="archive" size="14"></i> Vault</button>
+                <button onclick="switchTab('admin')" id="tabAdmin" class="hidden text-rose-500 bg-rose-500/10 px-4 py-1 rounded-full border border-rose-500/20">Admin</button>
             </nav>
-            <div id="userDisplay" class="flex items-center gap-4 bg-slate-950/50 p-2 pr-6 rounded-2xl border border-white/5 cursor-pointer group" onclick="switchTab('profile')">
-                <div id="userAvatar" class="w-11 h-11 rounded-xl bg-blue-600 flex items-center justify-center font-black text-sm group-hover:scale-105 transition-all">?</div>
-                <div class="text-left"><p class="text-[9px] text-slate-500 font-bold uppercase">Archivist</p><p id="userName" class="text-sm font-black text-white leading-none">Guest</p></div>
+
+            <div class="flex items-center gap-4 bg-slate-950/50 p-2 pr-5 rounded-2xl border border-white/5 cursor-pointer" onclick="switchTab('profile')">
+                <div id="userAvatar" class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-black text-xs">?</div>
+                <div class="text-left"><p id="userName" class="text-sm font-black text-white leading-none">Guest</p></div>
             </div>
         </header>
 
-        <main class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <aside class="lg:col-span-3 glass rounded-[40px] p-6 h-[800px] flex flex-col border border-white/5">
-                <div class="relative mb-6">
-                    <input type="text" id="dbSearch" class="w-full bg-slate-950 border border-slate-800 rounded-2xl py-4 px-12 outline-none focus:ring-2 focus:ring-blue-500 text-sm" placeholder="Search terminal...">
-                    <i data-lucide="search" class="absolute left-4 top-4 w-5 text-slate-500"></i>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <aside class="lg:col-span-3 space-y-6">
+                <div class="glass rounded-[32px] p-6 border border-white/5">
+                    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-6 flex items-center gap-2">
+                        <i data-lucide="globe" size="12"></i> Set Explorer
+                    </h3>
+                    <div id="setGrid" class="grid grid-cols-4 gap-3 overflow-y-auto max-h-[400px] custom-scroll pr-2">
+                        </div>
                 </div>
-                <div id="listContainer" class="flex-1 overflow-y-auto custom-scroll space-y-2"></div>
+
+                <div class="glass rounded-[32px] p-6 border border-white/5">
+                    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4">Network Stats</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center"><span class="text-xs text-slate-400">Archivists</span><span id="statUsers" class="text-xs font-black">0</span></div>
+                        <div class="flex justify-between items-center"><span class="text-xs text-slate-400">Global Cards</span><span id="statCards" class="text-xs font-black">0</span></div>
+                    </div>
+                </div>
             </aside>
 
             <section class="lg:col-span-9 space-y-8">
                 
-                <div id="searchView" class="glass rounded-[40px] p-10 min-h-[500px] border border-white/5">
-                    <div id="cardContent" class="hidden">
-                        <div class="flex flex-col xl:flex-row gap-12">
-                            <div class="w-full xl:w-[320px] shrink-0">
-                                <img id="displayImg" class="w-full rounded-[30px] shadow-2xl mb-6 ring-1 ring-white/10">
-                                <button onclick="addToVault()" class="w-full py-4 bg-blue-600 hover:bg-blue-500 rounded-2xl font-black text-xs uppercase tracking-widest transition-all">Secure in Vault</button>
-                            </div>
-                            <div class="flex-1">
-                                <h2 id="displayName" class="text-6xl font-black tracking-tighter"></h2>
-                                <p id="displaySet" class="text-blue-500 font-bold uppercase text-xs mt-2 tracking-widest mb-10"></p>
-                                <div class="grid grid-cols-3 gap-6 mb-10">
-                                    <div class="bg-slate-950 p-6 rounded-3xl border border-white/5"><p class="text-[9px] text-slate-500 font-black mb-1">VALUE</p><p id="displayPrice" class="text-3xl font-black text-white">£0.00</p></div>
-                                    <div class="bg-slate-950 p-6 rounded-3xl border border-white/5"><p class="text-[9px] text-slate-500 font-black mb-1">MANA</p><p id="displayCMC" class="text-3xl font-black text-violet-400">0</p></div>
-                                    <div class="bg-slate-950 p-6 rounded-3xl border border-white/5"><p class="text-[9px] text-slate-500 font-black mb-1">STATUS</p><p class="text-xs font-black text-emerald-500 mt-1">Sovereign</p></div>
-                                </div>
-                                <div class="h-64 bg-slate-950/30 rounded-[32px] p-6 border border-white/5"><canvas id="priceChart"></canvas></div>
-                            </div>
+                <div id="plazaView" class="space-y-6">
+                    <div class="glass p-6 rounded-[32px] border border-blue-500/20 bg-blue-500/5">
+                        <div class="flex gap-4">
+                            <div class="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center"><i data-lucide="pen-tool" class="text-slate-400"></i></div>
+                            <input type="text" id="postInput" placeholder="Share a pull or deck idea to the Nexus..." class="flex-1 bg-transparent border-none outline-none text-sm font-medium" onkeypress="if(e.key === 'Enter') createPost()">
+                            <button onclick="createPost()" class="bg-blue-600 px-6 py-2 rounded-xl text-[10px] font-black uppercase">Post</button>
                         </div>
                     </div>
+                    <div id="feedContainer" class="space-y-4">
+                        </div>
+                </div>
+
+                <div id="searchView" class="hidden glass rounded-[40px] p-8 border border-white/5">
+                    <div class="flex gap-4 mb-8">
+                        <div class="relative flex-1">
+                            <input type="text" id="dbSearch" placeholder="Search the Multiverse Database..." class="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 pl-14 outline-none focus:ring-2 focus:ring-blue-500">
+                            <i data-lucide="search" class="absolute left-5 top-5 text-slate-500"></i>
+                        </div>
+                    </div>
+                    <div id="searchGrid" class="grid grid-cols-2 md:grid-cols-4 gap-6"></div>
+                </div>
+
+                <div id="decksView" class="hidden glass rounded-[40px] p-10 border border-white/5">
+                    <div class="flex justify-between items-center mb-10">
+                        <h2 class="text-5xl font-black tracking-tighter">Deck <span class="text-blue-500">Architect</span></h2>
+                        <button onclick="createNewDeck()" class="bg-blue-600 px-6 py-3 rounded-xl text-[10px] font-black uppercase">+ New Build</button>
+                    </div>
+                    <div id="decksGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
                 </div>
 
                 <div id="vaultView" class="hidden glass rounded-[40px] p-10 border border-white/5">
-                    <h2 class="text-5xl font-black mb-10 tracking-tighter">Personal <span class="text-blue-500">Archive</span></h2>
+                    <h2 class="text-5xl font-black mb-10 tracking-tighter">Your <span class="text-emerald-500">Vault</span></h2>
                     <div id="vaultGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6"></div>
                 </div>
 
-                <div id="socialView" class="hidden glass rounded-[40px] p-10 border border-white/5">
-                    <div class="flex justify-between items-end mb-10">
-                        <h2 class="text-5xl font-black tracking-tighter">Global <span class="text-amber-500">Network</span></h2>
-                        <div class="text-right text-[10px] font-black text-slate-500 uppercase">Archive Leaderboard</div>
-                    </div>
-                    <div id="memberList" class="space-y-3"></div>
-                </div>
-
-                <div id="profileView" class="hidden glass rounded-[40px] p-12 border border-white/5">
-                    <div class="flex flex-col md:flex-row items-center gap-12 mb-12">
-                        <div id="profAvatar" class="w-40 h-40 rounded-[50px] bg-blue-600 flex items-center justify-center text-6xl font-black shadow-2xl">?</div>
-                        <div class="flex-1 text-center md:text-left">
-                            <h2 id="profName" class="text-6xl font-black tracking-tighter leading-none mb-2">Archivist</h2>
-                            <p class="text-slate-500 font-bold uppercase text-[10px] tracking-[0.3em]">Identity Verified • Sovereign Protocol</p>
-                            <div class="mt-8 flex gap-4 justify-center md:justify-start">
-                                <button onclick="logout()" class="bg-rose-500/10 text-rose-500 px-8 py-3 rounded-xl text-[10px] font-black uppercase border border-rose-500/20">Close Session</button>
-                                <button onclick="alert('Seed: ' + userData.seed)" class="bg-slate-900 text-white px-8 py-3 rounded-xl text-[10px] font-black uppercase border border-white/10">Show Recovery Seed</button>
-                            </div>
+                <div id="adminView" class="hidden glass rounded-[40px] p-10 border border-rose-500/20">
+                    <h2 class="text-4xl font-black text-rose-500 mb-8">Command Center</h2>
+                    <div class="grid grid-cols-2 gap-8 mb-8">
+                        <div class="bg-slate-950 p-6 rounded-3xl border border-white/5">
+                            <h4 class="text-[10px] font-black text-slate-500 uppercase mb-4">Broadcast System</h4>
+                            <input type="text" id="adminBroadcast" placeholder="Type global announcement..." class="w-full bg-slate-900 p-4 rounded-xl text-sm border border-slate-800 outline-none mb-4">
+                            <button onclick="sendBroadcast()" class="w-full bg-rose-600 py-3 rounded-xl text-[10px] font-black uppercase">Send to Network</button>
                         </div>
-                    </div>
-                    <div id="profileStats" class="grid grid-cols-1 md:grid-cols-3 gap-8"></div>
-                </div>
-
-                <div id="adminView" class="hidden glass rounded-[40px] p-10 border border-rose-500/20 admin-glow">
-                    <div class="flex justify-between items-center mb-10">
-                        <h2 class="text-5xl font-black tracking-tighter text-rose-500">Command Center</h2>
-                        <button onclick="wipeAllData()" class="bg-rose-600 px-6 py-3 rounded-xl text-[10px] font-black uppercase">Wipe All Network Data</button>
-                    </div>
-                    <div class="overflow-hidden rounded-3xl border border-white/5">
-                        <table class="w-full text-left">
-                            <thead class="bg-slate-950 text-[10px] font-black text-slate-500 uppercase">
-                                <tr><th class="p-6">User Identity</th><th>Vault Size</th><th>Actions</th></tr>
-                            </thead>
-                            <tbody id="adminUserList" class="divide-y divide-white/5"></tbody>
-                        </table>
+                        <div id="adminUserList" class="bg-slate-950 p-6 rounded-3xl border border-white/5 overflow-y-auto max-h-[300px]">
+                            </div>
                     </div>
                 </div>
 
             </section>
-        </main>
+        </div>
     </div>
 
     <script>
-        // --- CORE CONFIG ---
-        const ADMIN_EMAIL = "admin@manamarket.io"; // <--- CHANGE TO YOUR EMAIL
-        let rates = { GBP: 0.79 }, activeCard = null, pChart = null, currentUser = null, isRegister = false;
+        const ADMIN_EMAIL = "admin@manamarket.io";
+        let currentUser = null, userData = null;
 
-        async function hashPassword(password, salt) {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(password + salt);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-            return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
-        const WORD_LIST = ["alpha", "bravo", "cargo", "delta", "echo", "foxtrot", "golf", "hotel", "indigo", "joker", "kilo", "lima", "mambo", "neon", "oscar", "papa", "quick", "romeo", "sierra", "tango", "ultra", "victor", "whisky", "xray", "yankee", "zebra"];
-        function generateSeed() { let s = []; for(let i=0; i<12; i++) s.push(WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)]); return s.join(' '); }
-
-        // --- AUTH ---
-        function toggleAuthMode() {
-            isRegister = !isRegister;
-            document.getElementById('authTitle').innerText = isRegister ? 'New Profile' : 'Nexus Encryption';
-            document.getElementById('registerFields').classList.toggle('hidden', !isRegister);
-        }
-
-        async function handleAuthAction() {
-            const email = document.getElementById('authEmail').value.toLowerCase();
-            const pass = document.getElementById('authPass').value;
-            let users = JSON.parse(localStorage.getItem('mm_users')) || {};
-            if(!email || !pass) return;
-
-            if(isRegister) {
-                const salt = Array.from(crypto.getRandomValues(new Uint8Array(16))).map(b => b.toString(16).padStart(2, '0')).join('');
-                const hash = await hashPassword(pass, salt);
-                const seed = generateSeed();
-                users[email] = { hash, salt, seed, vault: [], metadata: { joined: 'March 2026' } };
-                localStorage.setItem('mm_users', JSON.stringify(users));
-                showSeedUI(seed);
-            } else {
-                const user = users[email];
-                if(user && (await hashPassword(pass, user.salt)) === user.hash) {
-                    localStorage.setItem('mm_session', JSON.stringify({ email, ts: Date.now() }));
-                    location.reload();
-                } else alert("Invalid Key");
-            }
-        }
-
-        function showSeedUI(seed) {
-            document.getElementById('authMainUI').classList.add('hidden');
-            document.getElementById('seedDisplayUI').classList.remove('hidden');
-            const grid = document.getElementById('seedGrid');
-            seed.split(' ').forEach((w, i) => grid.innerHTML += `<div class="bg-slate-900 p-2 rounded-lg border border-white/5 text-slate-400"><span class="opacity-30 mr-2">${i+1}.</span>${w}</div>`);
-        }
-
-        function showRecoveryUI() {
-            document.getElementById('authMainUI').classList.add('hidden');
-            document.getElementById('recoveryActionUI').classList.remove('hidden');
-        }
-
-        async function executeRecovery() {
-            const email = document.getElementById('authEmail').value.toLowerCase();
-            const seed = document.getElementById('recoverySeedInput').value.trim();
-            const newKey = document.getElementById('newMasterKey').value;
-            let users = JSON.parse(localStorage.getItem('mm_users')) || {};
-            if(users[email] && users[email].seed === seed) {
-                users[email].hash = await hashPassword(newKey, users[email].salt);
-                localStorage.setItem('mm_users', JSON.stringify(users));
-                alert("Reset successful.");
-                location.reload();
-            } else alert("Recovery failed.");
-        }
-
-        function logout() { localStorage.removeItem('mm_session'); location.reload(); }
-
-        // --- MAIN APP ---
+        // --- CORE ENGINE ---
         function switchTab(mode) {
-            ['search', 'vault', 'social', 'profile', 'admin'].forEach(m => {
+            ['plaza', 'search', 'decks', 'vault', 'admin', 'profile'].forEach(m => {
                 const view = document.getElementById(`${m}View`);
                 if(view) view.classList.toggle('hidden', m !== mode);
-                const btn = document.getElementById(`tab${m.charAt(0).toUpperCase()+m.slice(1)}`);
-                if(btn) btn.classList.toggle('active-tab', m === mode);
+                const tab = document.getElementById(`tab${m.charAt(0).toUpperCase()+m.slice(1)}`);
+                if(tab) tab.classList.toggle('active-tab', m === mode);
             });
-            if(mode === 'social') renderSocial();
+            if(mode === 'plaza') renderPlaza();
+            if(mode === 'decks') renderDecks();
             if(mode === 'vault') renderVault();
-            if(mode === 'profile') renderProfile();
             if(mode === 'admin') renderAdmin();
         }
 
-        document.getElementById('dbSearch').addEventListener('keypress', async (e) => {
-            if(e.key === 'Enter') {
-                const res = await fetch(`https://api.scryfall.com/cards/search?q=${encodeURIComponent(e.target.value)}`);
-                const data = await res.json();
-                if(data.data) renderList(data.data);
-            }
-        });
+        // --- SOCIAL (PLAZA) ---
+        function createPost() {
+            const text = document.getElementById('postInput').value;
+            if(!text) return;
+            const posts = JSON.parse(localStorage.getItem('mm_posts')) || [];
+            posts.unshift({
+                id: Date.now(),
+                user: currentUser.split('@')[0],
+                content: text,
+                likes: 0,
+                ts: new Date().toLocaleTimeString()
+            });
+            localStorage.setItem('mm_posts', JSON.stringify(posts));
+            document.getElementById('postInput').value = '';
+            renderPlaza();
+        }
 
-        function renderList(cards) {
-            document.getElementById('listContainer').innerHTML = cards.map(c => `
-                <div onclick='showCard(${JSON.stringify(c).replace(/'/g, "&apos;")})' class="p-4 bg-slate-900 border border-white/5 rounded-2xl flex justify-between cursor-pointer hover:border-blue-500/50">
-                    <span class="text-xs font-bold truncate w-40">${c.name}</span>
-                    <span class="text-[10px] text-blue-400">£${(parseFloat(c.prices.usd || 0) * rates.GBP).toFixed(2)}</span>
+        function renderPlaza() {
+            const posts = JSON.parse(localStorage.getItem('mm_posts')) || [];
+            const broadcast = localStorage.getItem('mm_broadcast');
+            const container = document.getElementById('feedContainer');
+            
+            let html = broadcast ? `
+                <div class="glass p-5 rounded-[24px] border-l-4 border-rose-500 bg-rose-500/5 animate-pulse">
+                    <p class="text-[10px] font-black text-rose-500 uppercase mb-1">System Broadcast</p>
+                    <p class="text-sm font-bold text-white">${broadcast}</p>
+                </div>
+            ` : '';
+
+            html += posts.map(p => `
+                <div class="glass p-6 rounded-[32px] border border-white/5 post-card transition-all">
+                    <div class="flex justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-black text-[10px]">${p.user[0].toUpperCase()}</div>
+                            <span class="text-xs font-black uppercase tracking-widest">${p.user}</span>
+                        </div>
+                        <span class="text-[10px] text-slate-600 font-bold">${p.ts}</span>
+                    </div>
+                    <p class="text-slate-300 text-sm leading-relaxed">${p.content}</p>
+                    <div class="mt-6 pt-4 border-t border-white/5 flex gap-6 text-[10px] font-black text-slate-500 uppercase">
+                        <button class="hover:text-blue-500 flex items-center gap-1"><i data-lucide="arrow-big-up" size="14"></i> Upvote</button>
+                        <button class="hover:text-white flex items-center gap-1"><i data-lucide="message-circle" size="14"></i> Comment</button>
+                    </div>
+                </div>
+            `).join('');
+            container.innerHTML = html;
+            lucide.createIcons();
+        }
+
+        // --- SET EXPLORER ---
+        async function loadSets() {
+            const res = await fetch('https://api.scryfall.com/sets');
+            const data = await res.json();
+            document.getElementById('setGrid').innerHTML = data.data.slice(0, 40).map(s => `
+                <div onclick="browseSet('${s.code}')" class="aspect-square glass rounded-xl flex items-center justify-center cursor-pointer hover:bg-blue-600/20 transition-all group" title="${s.name}">
+                    <img src="${s.icon_svg_uri}" class="w-6 h-6 invert opacity-40 group-hover:opacity-100">
                 </div>
             `).join('');
         }
 
-        function showCard(card) {
-            activeCard = card;
-            document.getElementById('cardContent').classList.remove('hidden');
-            document.getElementById('displayImg').src = card.image_uris?.normal || card.card_faces[0].image_uris.normal;
-            document.getElementById('displayName').innerText = card.name;
-            document.getElementById('displaySet').innerText = card.set_name;
-            document.getElementById('displayPrice').innerText = `£${(parseFloat(card.prices.usd || 0) * rates.GBP).toFixed(2)}`;
-            document.getElementById('displayCMC').innerText = card.cmc || 0;
-            renderChart(parseFloat(card.prices.usd || 0));
+        async function browseSet(code) {
+            switchTab('search');
+            const res = await fetch(`https://api.scryfall.com/cards/search?q=set:${code}`);
+            const data = await res.json();
+            renderSearch(data.data);
         }
 
-        function addToVault() {
-            let users = JSON.parse(localStorage.getItem('mm_users'));
-            users[currentUser].vault.push({ id: Date.now(), name: activeCard.name, price: parseFloat(activeCard.prices.usd || 0), img: activeCard.image_uris?.small || card.card_faces[0].image_uris.small });
-            localStorage.setItem('mm_users', JSON.stringify(users));
-            alert("Added.");
-        }
+        // --- SEARCH ---
+        document.getElementById('dbSearch').addEventListener('keypress', async (e) => {
+            if(e.key === 'Enter') {
+                const res = await fetch(`https://api.scryfall.com/cards/search?q=${encodeURIComponent(e.target.value)}`);
+                const data = await res.json();
+                if(data.data) renderSearch(data.data);
+            }
+        });
 
-        function renderVault() {
-            const users = JSON.parse(localStorage.getItem('mm_users'));
-            document.getElementById('vaultGrid').innerHTML = users[currentUser].vault.map(c => `<div class="rounded-2xl overflow-hidden border border-white/5"><img src="${c.img}" class="w-full"></div>`).join('');
-        }
-
-        function renderSocial() {
-            const users = JSON.parse(localStorage.getItem('mm_users'));
-            const container = document.getElementById('memberList');
-            container.innerHTML = Object.keys(users).map(email => {
-                const worth = users[email].vault.reduce((s, c) => s + c.price, 0) * rates.GBP;
-                return `<div class="glass p-6 rounded-3xl border border-white/5 flex justify-between items-center"><span class="font-black">${email.split('@')[0]}</span><span class="text-emerald-400 font-black">£${worth.toFixed(2)}</span></div>`;
-            }).join('');
-        }
-
-        function renderProfile() {
-            const users = JSON.parse(localStorage.getItem('mm_users'));
-            const worth = users[currentUser].vault.reduce((s, c) => s + c.price, 0) * rates.GBP;
-            document.getElementById('profName').innerText = currentUser.split('@')[0];
-            document.getElementById('userAvatar').innerText = currentUser[0].toUpperCase();
-            document.getElementById('profAvatar').innerText = currentUser[0].toUpperCase();
-            document.getElementById('profileStats').innerHTML = `
-                <div class="bg-slate-950 p-10 rounded-[40px] border border-white/5 text-center"><p class="text-[9px] text-slate-500 font-black uppercase mb-2">Net Worth</p><p class="text-4xl font-black text-emerald-400">£${worth.toFixed(2)}</p></div>
-                <div class="bg-slate-950 p-10 rounded-[40px] border border-white/5 text-center"><p class="text-[9px] text-slate-500 font-black uppercase mb-2">Collection</p><p class="text-4xl font-black text-blue-400">${users[currentUser].vault.length}</p></div>
-                <div class="bg-slate-950 p-10 rounded-[40px] border border-white/5 text-center"><p class="text-[9px] text-slate-500 font-black uppercase mb-2">Identity</p><p class="text-2xl font-black text-violet-400">Sovereign</p></div>
-            `;
-        }
-
-        // --- ADMIN COMMANDS ---
-        function renderAdmin() {
-            const users = JSON.parse(localStorage.getItem('mm_users'));
-            const body = document.getElementById('adminUserList');
-            body.innerHTML = Object.keys(users).map(email => `
-                <tr class="hover:bg-white/5 transition-colors">
-                    <td class="p-6 font-bold text-sm">${email}</td>
-                    <td class="font-bold text-slate-500">${users[email].vault.length} Items</td>
-                    <td><button onclick="deleteUser('${email}')" class="text-rose-500 text-[10px] font-black uppercase tracking-widest hover:text-rose-400">Terminate Profile</button></td>
-                </tr>
+        function renderSearch(cards) {
+            document.getElementById('searchGrid').innerHTML = cards.slice(0, 20).map(c => `
+                <div class="relative group cursor-pointer" onclick="addToVaultDirect('${c.id}', '${c.name}', '${c.prices.usd}', '${c.image_uris?.normal || c.card_faces[0].image_uris.normal}')">
+                    <img src="${c.image_uris?.small || c.card_faces[0].image_uris.small}" class="w-full rounded-xl border border-white/10 group-hover:border-blue-500 transition-all">
+                    <div class="absolute inset-0 bg-blue-600/80 opacity-0 group-hover:opacity-100 flex items-center justify-center rounded-xl transition-all">
+                        <span class="text-[10px] font-black uppercase">Add to Vault</span>
+                    </div>
+                </div>
             `).join('');
         }
 
-        function deleteUser(email) {
-            if(confirm(`Confirm termination of ${email}?`)) {
-                let users = JSON.parse(localStorage.getItem('mm_users'));
-                delete users[email];
-                localStorage.setItem('mm_users', JSON.stringify(users));
-                renderAdmin();
-            }
+        // --- DECKS ---
+        function renderDecks() {
+            const decks = userData.decks || [];
+            document.getElementById('decksGrid').innerHTML = decks.map(d => `
+                <div class="glass p-8 rounded-[32px] border border-white/5">
+                    <div class="flex justify-between items-start mb-6">
+                        <h4 class="text-2xl font-black">${d.name}</h4>
+                        <div class="text-[10px] font-black text-blue-500 uppercase bg-blue-500/10 px-3 py-1 rounded-full">${d.cards.length} Cards</div>
+                    </div>
+                    <div class="h-20 flex items-end gap-1 mb-6">
+                        ${[2,5,8,3,4,6,2].map(h => `<div class="flex-1 bg-slate-800 rounded-t-sm" style="height: ${h*10}%"></div>`).join('')}
+                    </div>
+                    <button class="w-full py-3 bg-white/5 rounded-xl text-[10px] font-black uppercase hover:bg-white/10 transition-all">Open Builder</button>
+                </div>
+            `).join('');
         }
 
-        function wipeAllData() {
-            if(confirm("DANGER: This will delete the entire network database. Proceed?")) {
-                localStorage.removeItem('mm_users');
-                location.reload();
-            }
+        function createNewDeck() {
+            const name = prompt("Deck Name:");
+            if(!name) return;
+            userData.decks.push({ id: Date.now(), name, cards: [] });
+            saveData();
+            renderDecks();
         }
 
-        function renderChart(base) {
-            const ctx = document.getElementById('priceChart').getContext('2d');
-            if(pChart) pChart.destroy();
-            pChart = new Chart(ctx, { type: 'line', data: { labels: ['D1','D2','D3','D4','D5','D6','D7'], datasets: [{ data: [base*0.9, base*1.1, base*0.95, base*1.2, base, base*1.05, base], borderColor: '#3b82f6', tension: 0.4, fill: true, backgroundColor: 'rgba(59,130,246,0.05)', pointRadius: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#475569', font: { size: 9, weight: '800' } } } } } });
+        // --- ADMIN ---
+        function sendBroadcast() {
+            const msg = document.getElementById('adminBroadcast').value;
+            localStorage.setItem('mm_broadcast', msg);
+            alert("Broadcast live.");
+            renderPlaza();
         }
 
+        function renderAdmin() {
+            const users = JSON.parse(localStorage.getItem('mm_users')) || {};
+            document.getElementById('adminUserList').innerHTML = Object.keys(users).map(e => `
+                <div class="flex justify-between items-center py-3 border-b border-white/5">
+                    <span class="text-xs font-bold">${e}</span>
+                    <button onclick="deleteUser('${e}')" class="text-rose-500 text-[10px] font-black uppercase">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        // --- DATA MGMT ---
+        function addToVaultDirect(id, name, price, img) {
+            userData.vault.push({ id, name, price, img });
+            saveData();
+            alert(`Added ${name} to vault.`);
+        }
+
+        function renderVault() {
+            document.getElementById('vaultGrid').innerHTML = userData.vault.map(c => `
+                <img src="${c.img}" class="w-full rounded-xl border border-white/5 shadow-lg">
+            `).join('');
+        }
+
+        function saveData() {
+            const all = JSON.parse(localStorage.getItem('mm_users'));
+            all[currentUser] = userData;
+            localStorage.setItem('mm_users', JSON.stringify(all));
+            updateStats();
+        }
+
+        function updateStats() {
+            const all = JSON.parse(localStorage.getItem('mm_users')) || {};
+            document.getElementById('statUsers').innerText = Object.keys(all).length;
+            let totalCards = 0;
+            Object.values(all).forEach(u => totalCards += u.vault.length);
+            document.getElementById('statCards').innerText = totalCards;
+        }
+
+        // --- INIT ---
         function init() {
             const session = JSON.parse(localStorage.getItem('mm_session'));
-            if(session && (Date.now() - session.ts < 86400000)) {
+            if(session) {
                 currentUser = session.email;
+                const all = JSON.parse(localStorage.getItem('mm_users'));
+                userData = all[currentUser];
                 if(currentUser === ADMIN_EMAIL) document.getElementById('tabAdmin').classList.remove('hidden');
                 document.getElementById('userName').innerText = currentUser.split('@')[0];
                 document.getElementById('userAvatar').innerText = currentUser[0].toUpperCase();
-                switchTab('search');
-            } else { document.getElementById('authModal').classList.remove('hidden'); }
+                loadSets();
+                updateStats();
+                switchTab('plaza');
+            } else {
+                document.getElementById('authModal').classList.remove('hidden');
+            }
             lucide.createIcons();
         }
+
+        // Simplistic Auth for this demo
+        async function handleAuthAction() {
+            const email = document.getElementById('authEmail').value.toLowerCase();
+            const pass = document.getElementById('authPass').value;
+            let users = JSON.parse(localStorage.getItem('mm_users')) || {};
+            if(!users[email]) {
+                users[email] = { hash: pass, vault: [], decks: [], seed: 'demo-seed-word-list' };
+                localStorage.setItem('mm_users', JSON.stringify(users));
+            }
+            localStorage.setItem('mm_session', JSON.stringify({ email, ts: Date.now() }));
+            location.reload();
+        }
+
         init();
     </script>
 </body>
